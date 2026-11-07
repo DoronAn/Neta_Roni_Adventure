@@ -17,7 +17,7 @@ for label, fx in variants.items():
         accessories.FIX[("flowers", n)] = fx
         im = accessories.head_with_hat(cutout(f"head_{n}.jpg"), n, "flowers", ring, chins, skulls)
         bg = Image.new("RGBA", im.size, (255, 255, 255, 255)); bg.alpha_composite(im)
-        c = bg.convert("RGB").crop((60, 560, 964, 1024 + 600 - 60)).resize((T - 8, int((T - 8) * 1004 / 904)))
+        c = bg.convert("RGB").crop((60, 560 + accessories.PAD - 600, 964, 1024 + accessories.PAD - 60)).resize((T - 8, int((T - 8) * 1004 / 904)))
         c = c.crop((0, 0, T - 8, T - 8))
         sheet.paste(c, (i * T + 4, 36)); d.text((i * T + 8, 6), label if n == "tabaxi_m" else "", fill="#2b1d14", font=f); i += 1
 sheet.save("../shots/review_cats.png"); print(sheet.size)
