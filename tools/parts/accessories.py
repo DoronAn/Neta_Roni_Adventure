@@ -13,8 +13,8 @@ def trim(im): return im.crop(im.getbbox())
 # Headwear, in head-source pixels: width, and where the hat's base sits (fraction of the way from skull top to chin).
 HATS = {
     "crown":   dict(w=380, base=0.13),
-    "wizard":  dict(w=580, base=0.20, squash=0.62),
-    "cap":     dict(w=640, base=0.16),
+    "wizard":  dict(w=600, base=0.32, squash=0.62),
+    "cap":     dict(w=780, base=0.20),
     "flowers": dict(w=640, base=0.15, ring=True),
 }
 def load_hat(name):
@@ -39,8 +39,11 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
     return out
 
 PAD = 600     # room above the head for tall hats
-PET_H = 300   # companion height in body pixels (the body is ~905 px tall)
+PET_H = 380   # companion height in body pixels (the body is ~905 px tall)
 def load_pet(name):
     im = trim(cutout(f"pet_{name}.jpg"))
     s = PET_H / max(im.height, im.width * 0.85)
     return im.resize((int(im.width * s), int(im.height * s)), Image.LANCZOS)
+
+# Heads that sit lower on the body, in body pixels (Doron, 2026-11-07: the dragonborn sat too high).
+HEAD_DROP = {"dragonborn_m": 26, "dragonborn_f": 26}
