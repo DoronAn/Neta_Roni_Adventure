@@ -11,3 +11,4 @@ Run from a folder holding the raw parts (these scripts expect `head_<name>.jpg` 
 - `sheet_bodies.py`: one head on each of the 9 bodies. Every body's neck stub sits at the same place (x 459-565, top row ~75), so one anchor (chin at row 124) fits them all.
 - `recolor.py`: outfit colour by hue swap. Each recolourable body lists its garment's hue range and minimum saturation (`GARMENT`); pixels inside it move to the target hue, keeping their texture. Druid, cleric and barbarian stay as drawn. `sheet_colors.py` shows every body in every colour.
 - `recolor2.py`: the three classes without one clear garment hue. Druid: the olive robe (hue 41-58) swaps, the leaves stay. Cleric: the white robe and cape (light, nearly colourless) take a pastel dye. Barbarian: the dark undershirt (sleeves, trousers) takes a strong dye; the fur and armour stay.
+- `sheet_fairy.py`: fairies get `back_wings` behind the body, at full source size, the wing joint (source 512, 520) on body row 300.
