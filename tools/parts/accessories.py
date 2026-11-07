@@ -20,7 +20,7 @@ KEEP_TOP = ("tabaxi", "dragonborn")   # cat ears and horns stay visible beside a
 HATS = {
     "crown":   dict(base=0.15, fit=0.80),
     "wizard":  dict(base=0.24, fit=0.90, squash=0.62, hide=True),
-    "cap":     dict(base=0.18, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81), tilt=12, dy=15, dx=-55),
+    "cap":     dict(base=0.18, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81), tilt=14, dy=0, dx=-170),
     "flowers": dict(base=0.21, fit=1.14, squash=0.95, ring=True),
 }
 # Per-head corrections, checked one by one on the review sheets: dy moves the hat down (head px), fit scales it.
@@ -32,7 +32,7 @@ FIX = {
     ("cap", "tabaxi_m"): dict(fit=1.0, tilt=0, dy=0, dx=0), ("cap", "tabaxi_f"): dict(fit=1.0, tilt=0, dy=0, dx=0),
     ("cap", "dragonborn_m"): dict(tilt=0, dy=0, dx=0), ("cap", "dragonborn_f"): dict(tilt=0, dy=0, dx=0),
     ("flowers", "tabaxi_m"): dict(fit=0.66, dy=-25, squash=0.5, tilt=32, dx=-130),
-    ("flowers", "tabaxi_f"): dict(fit=0.66, dy=-8, squash=0.5, tilt=32, dx=-140),
+    ("flowers", "tabaxi_f"): dict(fit=0.66, dy=14, squash=0.5, tilt=32, dx=-140),
 }
 
 def load_hat(name):
