@@ -13,8 +13,8 @@ def trim(im): return im.crop(im.getbbox())
 # Headwear, in head-source pixels: width, and where the hat's base sits (fraction of the way from skull top to chin).
 HATS = {
     "crown":   dict(w=380, base=0.13),
-    "wizard":  dict(w=600, base=0.32, squash=0.62),
-    "cap":     dict(w=780, base=0.20),
+    "wizard":  dict(w=600, base=0.32, squash=0.62, hide_hair=True),
+    "cap":     dict(w=780, base=0.20, anchor=0.41),  # the beret's centre is 41% across the picture (the feather sits right)
     "flowers": dict(w=640, base=0.15, ring=True),
 }
 def load_hat(name):
@@ -27,7 +27,10 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
     w = p["w"]; s = w / hat_img.width; hi = hat_img.resize((w, int(hat_img.height * s * p.get("squash", 1))), Image.LANCZOS)
     base_y = int(sk["top"] + p["base"] * (chin - sk["top"]))
     out = Image.new("RGBA", (head_img.width, head_img.height + PAD), (0, 0, 0, 0))
-    x = sk["cx"] - w // 2; base_y += PAD
+    x = sk["cx"] - int(w * p.get("anchor", 0.5)); base_y += PAD
+    if p.get("hide_hair") and not head_name.startswith(("tabaxi", "dragonborn")):
+        # hair above the brim is under the hat; cat ears and horns stay out
+        a = np.asarray(head_img).copy(); a[:base_y - PAD - 18, :, 3] = 0; head_img = Image.fromarray(a, "RGBA")
     if p.get("ring"):       # the far half of the ring goes behind the head, the near half in front
         y = base_y - hi.height // 2
         back = hi.copy(); a = np.asarray(back).copy(); a[hi.height // 2:, :, 3] = 0; back = Image.fromarray(a, "RGBA")
@@ -39,10 +42,11 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
     return out
 
 PAD = 600     # room above the head for tall hats
-PET_H = 380   # companion height in body pixels (the body is ~905 px tall)
+PET_H = 380
+PET_SCALE = {"dragon": 1.2, "fox": 1.2}   # companion height in body pixels (the body is ~905 px tall)
 def load_pet(name):
     im = trim(cutout(f"pet_{name}.jpg"))
-    s = PET_H / max(im.height, im.width * 0.85)
+    s = PET_H * PET_SCALE.get(name, 1) / max(im.height, im.width * 0.85)
     return im.resize((int(im.width * s), int(im.height * s)), Image.LANCZOS)
 
 # Heads that sit lower on the body, in body pixels (Doron, 2026-11-07: the dragonborn sat too high).
