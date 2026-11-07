@@ -4,9 +4,12 @@
 // so add new entries at the END of a list, never in the middle.
 //
 // The Hebrew names are a FIRST DRAFT: the birthday kids get the final say. Each name
-// has a masculine (m) and feminine (f) form; the page shows the one matching the
+// has a masculine (m) and feminine (f) form where Hebrew needs one; the page shows the one matching the
 // hero's gender. Keys end up in heroes saved on the kids' phones, so rename the
 // Hebrew freely, but don't change a key once the link is out.
+//
+// The pictures come from parts.js (written by tools/parts/build_web.py): outfit colours, headwear and
+// companions here must match the keys there.
 //
 // A plain script (not a module) so it also loads when the page is opened as a file.
 const CATALOG = {
@@ -247,103 +250,7 @@ const CATALOG = {
       ]
     }
   },
-  "colors": {
-    "red": "אדום",
-    "orange": "כתום",
-    "yellow": "צהוב",
-    "green": "ירוק",
-    "blue": "כחול",
-    "purple": "סגול",
-    "pink": "ורוד",
-    "black": "שחור",
-    "white": "לבן",
-    "gold": "זהב",
-    "silver": "כסף"
-  },
   "strengths_per_hero": 2,
-  "skins": {
-    "human": [
-      "#f6d3b3",
-      "#e2a878",
-      "#b8774a",
-      "#7a4a2c"
-    ],
-    "elf": [
-      "#f8dcc2",
-      "#e6b48a",
-      "#b98a62",
-      "#8a6a8e"
-    ],
-    "dwarf": [
-      "#f2c9a6",
-      "#d99a6c",
-      "#a8683f",
-      "#6e4428"
-    ],
-    "dragonborn": [
-      "#5aa65a",
-      "#c8503c",
-      "#c08a3a",
-      "#4a7fc0"
-    ],
-    "tabaxi": [
-      "#e89a4a",
-      "#9a9aa2",
-      "#4a4048",
-      "#efd9b0"
-    ],
-    "fairy": [
-      "#fbe0cc",
-      "#e8b48c",
-      "#b07a52",
-      "#a3d9c9"
-    ]
-  },
-  "hair_styles": {
-    "short": {
-      "he": "קצר"
-    },
-    "long": {
-      "he": "ארוך"
-    },
-    "bun": {
-      "he": "קוקו"
-    },
-    "wild": {
-      "he": "פרוע"
-    }
-  },
-  "hair_colors": {
-    "black": {
-      "he": "שחור",
-      "hex": "#2a2220"
-    },
-    "brown": {
-      "he": "חום",
-      "hex": "#6b4226"
-    },
-    "blond": {
-      "he": "בלונדיני",
-      "hex": "#e2bd62"
-    },
-    "red": {
-      "he": "ג'ינג'י",
-      "hex": "#b5482a"
-    }
-  },
-  "color_hex": {
-    "red": "#c8323c",
-    "orange": "#e77d24",
-    "yellow": "#f2c230",
-    "green": "#3f9b4a",
-    "blue": "#2f6fc0",
-    "purple": "#7b4bb8",
-    "pink": "#e46fa7",
-    "black": "#3a3a44",
-    "white": "#efece4",
-    "gold": "#d4a92c",
-    "silver": "#b8bec7"
-  },
   "homelands": {
     "mountains": {
       "he": "הרי השלג",
@@ -392,6 +299,119 @@ const CATALOG = {
         "m": "שם למד לראות גם בחושך",
         "f": "שם למדה לראות גם בחושך"
       }
+    }
+  },
+  "outfit_colors": {
+    "original": "כמו בציור",
+    "red": "אדום",
+    "green": "ירוק",
+    "blue": "כחול",
+    "purple": "סגול",
+    "pink": "ורוד",
+    "black": "שחור"
+  },
+  "headwear": {
+    "none": "בלי כובע",
+    "crown": "כתר",
+    "wizard": "כובע קוסמים",
+    "cap": "כובע נוצה",
+    "flowers": "זר פרחים"
+  },
+  "companions": {
+    "none": "בלי",
+    "fox": "שועל",
+    "owl": "ינשוף",
+    "cat": "חתול",
+    "dragon": "דרקון קטן",
+    "wolf": "גור זאב",
+    "raven": "עורב",
+    "frog": "צפרדע",
+    "hedgehog": "קיפוד"
+  },
+  "epithets": {
+    "str": {
+      "m": [
+        "האמיץ",
+        "החזק",
+        "שובר הסלעים",
+        "לב הארי"
+      ],
+      "f": [
+        "האמיצה",
+        "החזקה",
+        "שוברת הסלעים",
+        "לב הלביאה"
+      ]
+    },
+    "dex": {
+      "m": [
+        "הזריז",
+        "קל הרגליים",
+        "החץ המהיר",
+        "צל הלילה"
+      ],
+      "f": [
+        "הזריזה",
+        "קלת הרגליים",
+        "החץ המהיר",
+        "צל הלילה"
+      ]
+    },
+    "con": {
+      "m": [
+        "העיקש",
+        "שאינו מוותר",
+        "סלע ההרים",
+        "הבלתי נלאה"
+      ],
+      "f": [
+        "העיקשת",
+        "שאינה מוותרת",
+        "סלע ההרים",
+        "הבלתי נלאית"
+      ]
+    },
+    "int": {
+      "m": [
+        "החכם",
+        "פותר החידות",
+        "קורא הכוכבים",
+        "שומר הספרים"
+      ],
+      "f": [
+        "החכמה",
+        "פותרת החידות",
+        "קוראת הכוכבים",
+        "שומרת הספרים"
+      ]
+    },
+    "wis": {
+      "m": [
+        "רואה הנסתר",
+        "הנבון",
+        "שומע הרוח",
+        "בעל העין החדה"
+      ],
+      "f": [
+        "רואת הנסתר",
+        "הנבונה",
+        "שומעת הרוח",
+        "בעלת העין החדה"
+      ]
+    },
+    "cha": {
+      "m": [
+        "המצחיק",
+        "בעל הקול הזהב",
+        "מאחד הלבבות",
+        "הנדיב"
+      ],
+      "f": [
+        "המצחיקה",
+        "בעלת קול הזהב",
+        "מאחדת הלבבות",
+        "הנדיבה"
+      ]
     }
   }
 };

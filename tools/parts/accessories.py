@@ -56,6 +56,14 @@ def load_hat(name):
 # its puff hanging over the left side. Scale and tilt follow from the two points, so each head gets its own.
 CAP_BAND = ((88, 528), (478, 527))
 
+def _forward(src, dst):
+    """The 3x3 affine (scale + rotation + shift) taking the two points src to the two points dst."""
+    (P0, P1), (T0, T1) = src, dst
+    s = math.hypot(T1[0] - T0[0], T1[1] - T0[1]) / math.hypot(P1[0] - P0[0], P1[1] - P0[1])
+    d = math.atan2(T1[1] - T0[1], T1[0] - T0[0]) - math.atan2(P1[1] - P0[1], P1[0] - P0[0])
+    c, sn = s * math.cos(d), s * math.sin(d)
+    return np.array([[c, -sn, T0[0] - (c * P0[0] - sn * P0[1])], [sn, c, T0[1] - (sn * P0[0] + c * P0[1])], [0, 0, 1.0]])
+
 def _place(img, src, dst, size):
     """img drawn on a canvas of `size`, scaled and rotated so the two points src land on the two points dst."""
     (P0, P1), (T0, T1) = src, dst
@@ -65,7 +73,7 @@ def _place(img, src, dst, size):
     c0 = P0[0] - (a * T0[0] + b * T0[1]); f0 = P0[1] - (e * T0[0] + f * T0[1])
     return img.transform(size, Image.AFFINE, (a, b, c0, e, f, f0), resample=Image.BICUBIC)
 
-def cap_on(head_img, head_name, hat_img, chins, skulls):
+def _cap_place(head_img, head_name, hat_img, chins, skulls):
     p = dict(HATS["cap"]); p.update(FIX.get(("cap", head_name), {}))
     sk = skulls[head_name]; chin = chins[head_name]; top = sk["top"]
     a = np.asarray(head_img)[..., 3] > 0
@@ -92,18 +100,27 @@ def cap_on(head_img, head_name, hat_img, chins, skulls):
                 cut = TL[1] if X < x0 else TR[1]
             cut = int(cut) - PAD
             if cut > 0: hd[:cut, X, 3] = 0
-    out = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    out.alpha_composite(Image.fromarray(hd, "RGBA"), (0, PAD)); out.alpha_composite(hat)
-    return out
+    return dict(head=Image.fromarray(hd, "RGBA"), back=[], front=[(hat, (0, 0))],
+                M={"full": _forward(CAP_BAND, (TL, TR))})
 
 def head_width(head_img, row):
     a = np.asarray(head_img)[..., 3] > 0
     xs = np.where(a[max(0, min(row, a.shape[0] - 1))])[0]
     return int(xs.min()), int(xs.max())
 
-def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
-    """The head with the hat on, on a canvas PAD px taller at the top (add PAD to the chin row)."""
-    if HATS[hat].get("band"): return cap_on(head_img, head_name, hat_img, chins, skulls)
+def _tilted(w, hh, x, y, sx, sy, tilt):
+    """Forward affine for a hat picture resized by (sx, sy), rotated by tilt degrees (counter-clockwise, about its
+    centre, as PIL's rotate(expand=True) does) and pasted with its unrotated top-left at (x, y)."""
+    t = math.radians(tilt); c, s = math.cos(t), math.sin(t)
+    cx, cy = x + w / 2, y + hh / 2
+    # canvas = centre + R (p_resized - (w/2, hh/2)), with R turning counter-clockwise in y-down coordinates
+    return np.array([[c * sx, s * sy, cx - c * w / 2 - s * hh / 2], [-s * sx, c * sy, cy + s * w / 2 - c * hh / 2], [0, 0, 1.0]])
+
+def place(head_img, head_name, hat, hat_img, chins, skulls):
+    """Where the hat goes on this head. Returns the head with the hair under the hat removed (to be drawn at
+    (0, PAD)), the hat layers behind and in front of it as placed pictures, and M: for each layer ("full", or
+    "back" and "front" for the flower ring), the 3x3 affine from the hat picture's pixels to the canvas."""
+    if HATS[hat].get("band"): return _cap_place(head_img, head_name, hat_img, chins, skulls)
     p = dict(HATS[hat]); p.update(FIX.get((hat, head_name), {}))
     sk = skulls[head_name]; chin = chins[head_name]
     base = int(sk["top"] + p["base"] * (chin - sk["top"])) + p.get("dy", 0)
@@ -111,12 +128,13 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
     w = int((x1 - x0) * HATS[hat]["fit"] * FIX.get((hat, head_name), {}).get("fit", 1))
     s = w / hat_img.width
     hi = hat_img.resize((w, max(1, int(hat_img.height * s * p.get("squash", 1)))), Image.LANCZOS)
+    sx, sy = w / hat_img.width, hi.height / hat_img.height
     cx = (x0 + x1) // 2 if not head_name.startswith(KEEP_TOP) else sk["cx"]
     x = cx - int(w * p.get("anchor", 0.5)) + p.get("dx", 0)
-    out = Image.new("RGBA", (head_img.width, head_img.height + PAD), (0, 0, 0, 0))
     head = head_img
     if p.get("ring"):       # the far half of the ring goes behind the head, the near half in front
         y = PAD + base - hi.height // 2
+        M = _tilted(w, hi.height, x, y, sx, sy, p.get("tilt", 0))
         a = np.asarray(hi)
         back = a.copy(); back[hi.height // 2:, :, 3] = 0
         front = a.copy(); front[:hi.height // 2, :, 3] = 0
@@ -125,10 +143,9 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
             back = back.rotate(p["tilt"], resample=Image.BICUBIC, expand=True)
             front = front.rotate(p["tilt"], resample=Image.BICUBIC, expand=True)
             x -= (back.width - hi.width) // 2; y -= (back.height - hi.height) // 2
-        out.alpha_composite(back, (x, y)); out.alpha_composite(head, (0, PAD))
-        out.alpha_composite(front, (x, y))
-        return out
+        return dict(head=head, back=[(back, (x, y))], front=[(front, (x, y))], M={"back": M, "front": M})
     y = PAD + base - hi.height
+    M = _tilted(w, hi.height, x, y, sx, sy, p.get("tilt", 0))
     if p.get("tilt"):
         r = hi.rotate(p["tilt"], resample=Image.BICUBIC, expand=True)
         x -= (r.width - hi.width) // 2; y -= (r.height - hi.height) // 2; hi = r; w = hi.width
@@ -147,7 +164,15 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
             cut = y + yb - lift - PAD        # in head coordinates: under the hat, a little above its bottom edge
             if cut > 0: hd[:cut, X, 3] = 0
         head = Image.fromarray(hd, "RGBA")
-    out.alpha_composite(head, (0, PAD)); out.alpha_composite(hi, (x, y))
+    return dict(head=head, back=[], front=[(hi, (x, y))], M={"full": M})
+
+def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
+    """The head with the hat on, on a canvas PAD px taller at the top (add PAD to the chin row)."""
+    pl = place(head_img, head_name, hat, hat_img, chins, skulls)
+    out = Image.new("RGBA", (head_img.width, head_img.height + PAD), (0, 0, 0, 0))
+    for im, xy in pl["back"]: out.alpha_composite(im, xy)
+    out.alpha_composite(pl["head"], (0, PAD))
+    for im, xy in pl["front"]: out.alpha_composite(im, xy)
     return out
 
 PET_H = 380
