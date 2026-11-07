@@ -8,7 +8,7 @@ heads = list(chins); h_img = accessories.load_hat(hat)
 T = 300; f = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 18)
 sheet = Image.new("RGB", (6 * T, 2 * (T + 60)), "white"); d = ImageDraw.Draw(sheet)
 for j, n in enumerate(heads):
-    src = cutout("head_human_m2.jpg" if n == "human_m2" else f"head_{n}.jpg")
+    src = cutout("head_human_m.jpg" if n == "human_m" else f"head_{n}.jpg")
     im = accessories.head_with_hat(src, n, hat, h_img, chins, skulls)
     bg = Image.new("RGBA", im.size, (255, 255, 255, 255)); bg.alpha_composite(im)
     crop = bg.convert("RGB").crop((40, 170, 984, 1024 + 600 - 120))

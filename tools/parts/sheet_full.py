@@ -10,7 +10,7 @@ wings = cutout("back_wings.jpg")
 def hero(cls, head, color="original", hat=None, pet=None):
     b = cutout(f"body_{cls}.jpg")
     if color != "original": b = recolor(b, cls, color) if cls in GARMENT else recolor2(b, cls, color)
-    h = cutout("head_human_m2.jpg" if head == "human_m2" else f"head_{head}.jpg"); chin = chins[head]
+    h = cutout("head_human_m.jpg" if head == "human_m" else f"head_{head}.jpg"); chin = chins[head]
     if hat: h = head_with_hat(h, head, hat, load_hat(hat), chins, skulls); chin += PAD
     hs = h.resize((int(h.width * S), int(h.height * S)), Image.LANCZOS)
     top = int(PAD * S) + 460; right = 320
@@ -22,7 +22,7 @@ def hero(cls, head, color="original", hat=None, pet=None):
     if pet:
         p = load_pet(pet); c.alpha_composite(p, (920 - p.width // 2, top + 985 - p.height))
     return c.convert("RGB").crop((30, 120, 1024 + right - 10, 1024 + top))
-combos = [("fighter","human_m2","original","crown","fox"), ("wizard","elf_f","purple","wizard","owl"),
+combos = [("fighter","human_m","original","crown","fox"), ("wizard","elf_f","purple","wizard","owl"),
           ("rogue","tabaxi_m","black","cap","cat"), ("cleric","dwarf_m","blue","flowers","hedgehog"),
           ("ranger","fairy_f","original","flowers","wolf"), ("bard","human_f","pink","cap","frog"),
           ("barbarian","dragonborn_m","red",None,"dragon"), ("paladin","dwarf_f","original","crown","raven"),

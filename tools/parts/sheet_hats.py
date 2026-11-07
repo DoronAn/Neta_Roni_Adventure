@@ -11,7 +11,7 @@ for j, n in enumerate(heads): d.text((90 + j * T + 4, 4), n.replace("_m2", "_m")
 for i, h in enumerate(hats):
     d.text((6, 24 + i * TH + TH // 2), h, fill="#2b1d14", font=f)
     for j, n in enumerate(heads):
-        src = cutout("head_human_m2.jpg" if n == "human_m2" else f"head_{n}.jpg")
+        src = cutout("head_human_m.jpg" if n == "human_m" else f"head_{n}.jpg")
         im = head_with_hat(src, n, h, hats[h], chins, skulls)
         bg = Image.new("RGBA", im.size, (255, 255, 255, 255)); bg.alpha_composite(im)
         crop = bg.convert("RGB").crop((0, 170, 1024, 1024 + 600))

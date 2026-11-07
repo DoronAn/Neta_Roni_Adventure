@@ -1,11 +1,11 @@
 import json
 from PIL import Image, ImageDraw, ImageFont
 from join import cutout
-chins = json.load(open("heads.json")); chins["human_m"] = chins.get("human_m", chins.get("human_m2"))
+chins = json.load(open("heads.json")); chins["human_m"] = chins.get("human_m", chins.get("human_m"))
 S, CHIN_AT = 0.434, 124
 def hero(body, head):
     b = cutout(f"body_{body}.jpg")
-    hf = "head_human_m2.jpg" if head == "human_m" else f"head_{head}.jpg"
+    hf = "head_human_m.jpg" if head == "human_m" else f"head_{head}.jpg"
     h = cutout(hf).resize((int(1024 * S), int(1024 * S)), Image.LANCZOS)
     off = int(1024 * S)
     c = Image.new("RGBA", (1024, 1024 + off), (255, 255, 255, 0))

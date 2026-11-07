@@ -10,7 +10,7 @@ for i, (label, fx) in enumerate(variants.items()):
     for j, n in enumerate(heads):
         fx2 = dict(fx); fx2.update(fx.get("per", {}).get(n, {})); fx2.pop("per", None)
         accessories.FIX[(hat, n)] = fx2
-        im = accessories.head_with_hat(cutout("head_human_m2.jpg" if n == "human_m2" else f"head_{n}.jpg"), n, hat, img, chins, skulls)
+        im = accessories.head_with_hat(cutout("head_human_m.jpg" if n == "human_m" else f"head_{n}.jpg"), n, hat, img, chins, skulls)
         bg = Image.new("RGBA", im.size, (255, 255, 255, 255)); bg.alpha_composite(im)
         c = bg.convert("RGB").crop((40, 330, 984, 1274)).resize((T - 6, T - 6), Image.LANCZOS)
         sheet.paste(c, (j * T + 3, i * (T + 30) + 26))

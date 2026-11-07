@@ -7,7 +7,7 @@ SPOT = {"fighter": (772, 492, 130), "wizard": (585, 330, 120), "rogue": (512, 33
         "paladin": (512, 655, 120)}   # crest: centre and diameter on the 1024 px body
 crests = {t: cutout(f"crest_{t}.jpg") for t in ("neta", "roni")}
 for t in crests: crests[t] = crests[t].crop(crests[t].getbbox())
-heads = {"neta": ["human_f", "elf_m", "dwarf_m", "tabaxi_f", "fairy_f"], "roni": ["human_m2", "elf_f", "dragonborn_m", "tabaxi_m", "dwarf_f"]}
+heads = {"neta": ["human_f", "elf_m", "dwarf_m", "tabaxi_f", "fairy_f"], "roni": ["human_m", "elf_f", "dragonborn_m", "tabaxi_m", "dwarf_f"]}
 classes = ["fighter","wizard","rogue","cleric","ranger","bard","barbarian","druid","paladin"]
 def hero(cls, head, team):
     b = cutout(f"body_{cls}.jpg"); h = cutout(f"head_{head}.jpg").resize((int(1024 * S),) * 2, Image.LANCZOS)
