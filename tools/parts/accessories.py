@@ -20,7 +20,7 @@ KEEP_TOP = ("tabaxi", "dragonborn")   # cat ears and horns stay visible beside a
 HATS = {
     "crown":   dict(base=0.15, fit=0.80),
     "wizard":  dict(base=0.24, fit=0.90, squash=0.62, hide=True),
-    "cap":     dict(base=0.18, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81)),
+    "cap":     dict(base=0.18, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81), tilt=12, dy=15),
     "flowers": dict(base=0.21, fit=1.14, squash=0.95, ring=True),
 }
 # Per-head corrections, checked one by one on the review sheets: dy moves the hat down (head px), fit scales it.
@@ -29,8 +29,10 @@ FIX = {
     ("crown", "dragonborn_m"): dict(fit=0.72), ("crown", "dragonborn_f"): dict(fit=0.72),
     ("wizard", "tabaxi_m"): dict(fit=0.95), ("wizard", "tabaxi_f"): dict(fit=0.9),
     ("wizard", "dragonborn_m"): dict(fit=0.85), ("wizard", "dragonborn_f"): dict(fit=0.85),
-    ("cap", "tabaxi_m"): dict(fit=1.0), ("cap", "tabaxi_f"): dict(fit=1.0),
-    ("flowers", "tabaxi_m"): dict(fit=0.70, dy=-62, squash=0.5), ("flowers", "tabaxi_f"): dict(fit=0.70, dy=-77, squash=0.5),
+    ("cap", "tabaxi_m"): dict(fit=1.0, tilt=0, dy=0), ("cap", "tabaxi_f"): dict(fit=1.0, tilt=0, dy=0),
+    ("cap", "dragonborn_m"): dict(tilt=0, dy=0), ("cap", "dragonborn_f"): dict(tilt=0, dy=0),
+    ("flowers", "tabaxi_m"): dict(fit=0.66, dy=-48, squash=0.5, tilt=32, dx=-130),
+    ("flowers", "tabaxi_f"): dict(fit=0.66, dy=-30, squash=0.5, tilt=32, dx=-140),
 }
 
 def load_hat(name):
@@ -69,6 +71,9 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
         out.alpha_composite(front, (x, y))
         return out
     y = PAD + base - hi.height
+    if p.get("tilt"):
+        r = hi.rotate(p["tilt"], resample=Image.BICUBIC, expand=True)
+        x -= (r.width - hi.width) // 2; y -= (r.height - hi.height) // 2; hi = r; w = hi.width
     if p.get("hide") and not head_name.startswith(KEEP_TOP):
         ha = np.asarray(hi)[..., 3] > 0
         e0, e1 = p.get("edge", (0.0, 1.0)); c0, c1 = int(e0 * w), int(e1 * w)
