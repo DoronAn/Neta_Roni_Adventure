@@ -2,6 +2,7 @@ import json
 from PIL import Image, ImageDraw, ImageFont
 from join import cutout
 from recolor import recolor, GARMENT
+from recolor2 import recolor2
 chins = json.load(open("heads.json"))
 S, CHIN_AT = 0.434, 124
 heads = ["human_m2","human_f","elf_m","elf_f","dwarf_m","dwarf_f","dragonborn_m","dragonborn_f","tabaxi_m","tabaxi_f","fairy_m","fairy_f"]
@@ -21,9 +22,8 @@ for j, c in enumerate(colors): d.text((110 + j * (TW + 6) + 8, 8), c, fill="#2b1
 for i, cls in enumerate(classes):
     base = cutout(f"body_{cls}.jpg"); y = 34 + i * (TH + 8)
     d.text((8, y + TH // 2 - 10), cls, fill="#2b1d14", font=f)
-    if cls not in GARMENT: d.text((8, y + TH // 2 + 10), "(fixed)", fill="#8a7a66", font=f)
     for j, c in enumerate(colors):
-        body = base if (c == "original" or cls not in GARMENT) else recolor(base, cls, c)
+        body = base if c == "original" else (recolor(base, cls, c) if cls in GARMENT else recolor2(base, cls, c))
         im = hero(body, heads[(i * 5 + j) % 12]).resize((TW, TH), Image.LANCZOS)
         sheet.paste(im, (110 + j * (TW + 6), y))
 sheet.save("../shots/all-heroes.png"); print(sheet.size)
