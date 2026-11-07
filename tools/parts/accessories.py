@@ -10,40 +10,80 @@ def cutout_all_white(path, thresh=232):
 
 def trim(im): return im.crop(im.getbbox())
 
-# Headwear, in head-source pixels: width, and where the hat's base sits (fraction of the way from skull top to chin).
+PAD = 600     # room above the head for tall hats
+KEEP_TOP = ("tabaxi", "dragonborn")   # cat ears and horns stay visible beside a hat
+
+# Headwear. base: where the hat's bottom sits, as a fraction of the way from skull top to chin.
+# fit: the hat's width as a multiple of the head's width at that row. hide: the hair above the hat's
+# bottom edge is under the hat, so it is removed. edge: which part of the picture is the hat's bottom
+# (for the cap, the beret: the left 81% of the picture; the feather is on the right).
 HATS = {
-    "crown":   dict(w=380, base=0.13),
-    "wizard":  dict(w=600, base=0.32, squash=0.62, hide_hair=True),
-    "cap":     dict(w=780, base=0.20, anchor=0.41),  # the beret's centre is 41% across the picture (the feather sits right)
-    "flowers": dict(w=640, base=0.15, ring=True),
+    "crown":   dict(base=0.25, fit=0.84),
+    "wizard":  dict(base=0.30, fit=1.10, squash=0.62, hide=True),
+    "cap":     dict(base=0.25, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81)),
+    "flowers": dict(base=0.21, fit=1.14, squash=0.95, ring=True),
 }
+# Per-head corrections, checked one by one on the review sheets: dy moves the hat down (head px), fit scales it.
+FIX = {
+    ("crown", "tabaxi_m"): dict(fit=0.7), ("crown", "tabaxi_f"): dict(fit=0.7),
+    ("crown", "dragonborn_m"): dict(fit=0.72), ("crown", "dragonborn_f"): dict(fit=0.72),
+    ("wizard", "tabaxi_m"): dict(fit=0.95), ("wizard", "tabaxi_f"): dict(fit=0.9),
+    ("wizard", "dragonborn_m"): dict(fit=0.72), ("wizard", "dragonborn_f"): dict(fit=0.72),
+    ("cap", "tabaxi_m"): dict(fit=1.0), ("cap", "tabaxi_f"): dict(fit=1.0),
+    ("flowers", "tabaxi_m"): dict(fit=0.95), ("flowers", "tabaxi_f"): dict(fit=0.95),
+}
+
 def load_hat(name):
     im = cutout_all_white(f"hat_{name}.jpg") if HATS[name].get("ring") else cutout(f"hat_{name}.jpg")
     return trim(im)
 
+def head_width(head_img, row):
+    a = np.asarray(head_img)[..., 3] > 0
+    xs = np.where(a[max(0, min(row, a.shape[0] - 1))])[0]
+    return int(xs.min()), int(xs.max())
+
 def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
-    """Returns the head with the hat on, on a canvas PAD px taller at the top (so add PAD to the chin row)."""
-    p = HATS[hat]; sk = skulls[head_name]; chin = chins[head_name]
-    w = p["w"]; s = w / hat_img.width; hi = hat_img.resize((w, int(hat_img.height * s * p.get("squash", 1))), Image.LANCZOS)
-    base_y = int(sk["top"] + p["base"] * (chin - sk["top"]))
+    """The head with the hat on, on a canvas PAD px taller at the top (add PAD to the chin row)."""
+    p = dict(HATS[hat]); p.update(FIX.get((hat, head_name), {}))
+    sk = skulls[head_name]; chin = chins[head_name]
+    base = int(sk["top"] + p["base"] * (chin - sk["top"])) + p.get("dy", 0)
+    x0, x1 = head_width(head_img, base)
+    w = int((x1 - x0) * HATS[hat]["fit"] * FIX.get((hat, head_name), {}).get("fit", 1))
+    s = w / hat_img.width
+    hi = hat_img.resize((w, max(1, int(hat_img.height * s * p.get("squash", 1)))), Image.LANCZOS)
+    cx = (x0 + x1) // 2 if not head_name.startswith(KEEP_TOP) else sk["cx"]
+    x = cx - int(w * p.get("anchor", 0.5))
     out = Image.new("RGBA", (head_img.width, head_img.height + PAD), (0, 0, 0, 0))
-    x = sk["cx"] - int(w * p.get("anchor", 0.5)); base_y += PAD
-    if p.get("hide_hair") and not head_name.startswith(("tabaxi", "dragonborn")):
-        # hair above the brim is under the hat; cat ears and horns stay out
-        a = np.asarray(head_img).copy(); a[:base_y - PAD - 18, :, 3] = 0; head_img = Image.fromarray(a, "RGBA")
+    head = head_img
     if p.get("ring"):       # the far half of the ring goes behind the head, the near half in front
-        y = base_y - hi.height // 2
-        back = hi.copy(); a = np.asarray(back).copy(); a[hi.height // 2:, :, 3] = 0; back = Image.fromarray(a, "RGBA")
-        front = hi.copy(); a = np.asarray(front).copy(); a[:hi.height // 2, :, 3] = 0; front = Image.fromarray(a, "RGBA")
-        out.alpha_composite(back, (x, y)); out.alpha_composite(head_img, (0, PAD)); out.alpha_composite(front, (x, y))
-    else:
-        y = base_y - hi.height
-        out.alpha_composite(head_img, (0, PAD)); out.alpha_composite(hi, (x, y))
+        y = PAD + base - hi.height // 2
+        a = np.asarray(hi)
+        back = a.copy(); back[hi.height // 2:, :, 3] = 0
+        front = a.copy(); front[:hi.height // 2, :, 3] = 0
+        out.alpha_composite(Image.fromarray(back, "RGBA"), (x, y)); out.alpha_composite(head, (0, PAD))
+        out.alpha_composite(Image.fromarray(front, "RGBA"), (x, y))
+        return out
+    y = PAD + base - hi.height
+    if p.get("hide") and not head_name.startswith(KEEP_TOP):
+        ha = np.asarray(hi)[..., 3] > 0
+        e0, e1 = p.get("edge", (0.0, 1.0)); c0, c1 = int(e0 * w), int(e1 * w)
+        bottoms = {c: np.where(ha[:, c])[0].max() for c in range(c0, c1) if ha[:, c].any()}
+        cols = sorted(bottoms)
+        hd = np.asarray(head).copy()
+        for X in range(hd.shape[1]):
+            c = X - x
+            if c in bottoms: yb = bottoms[c]
+            elif c < cols[0]: yb = bottoms[cols[0]]
+            elif c > cols[-1]: yb = bottoms[cols[-1]]
+            else: continue
+            cut = y + yb - 28 - PAD          # in head coordinates: a little above the hat's bottom edge
+            if cut > 0: hd[:cut, X, 3] = 0
+        head = Image.fromarray(hd, "RGBA")
+    out.alpha_composite(head, (0, PAD)); out.alpha_composite(hi, (x, y))
     return out
 
-PAD = 600     # room above the head for tall hats
 PET_H = 380
-PET_SCALE = {"dragon": 1.2, "fox": 1.2}   # companion height in body pixels (the body is ~905 px tall)
+PET_SCALE = {"dragon": 1.2, "fox": 1.2}
 def load_pet(name):
     im = trim(cutout(f"pet_{name}.jpg"))
     s = PET_H * PET_SCALE.get(name, 1) / max(im.height, im.width * 0.85)
