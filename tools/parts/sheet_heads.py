@@ -4,13 +4,15 @@ from join import cutout
 chins = json.load(open("heads.json"))
 body = cutout("body_fighter.jpg")
 S = 0.434
+import sys
+CHIN_AT = int(sys.argv[1]) if len(sys.argv) > 1 else 122
 def compose(name):
     head = cutout(f"head_{name}.jpg")
     hs = head.resize((int(1024 * S), int(1024 * S)), Image.LANCZOS)
     off = int(1024 * S)
     c = Image.new("RGBA", (1024, 1024 + off), (255, 255, 255, 0))
     c.alpha_composite(body, (0, off))
-    c.alpha_composite(hs, (512 - int(512 * S), off + 104 - int(chins[name] * S)))
+    c.alpha_composite(hs, (512 - int(512 * S), off + CHIN_AT - int(chins[name] * S)))
     return c
 ims = []
 for n in chins:
