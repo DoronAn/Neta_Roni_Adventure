@@ -18,9 +18,9 @@ KEEP_TOP = ("tabaxi", "dragonborn")   # cat ears and horns stay visible beside a
 # bottom edge is under the hat, so it is removed. edge: which part of the picture is the hat's bottom
 # (for the cap, the beret: the left 81% of the picture; the feather is on the right).
 HATS = {
-    "crown":   dict(base=0.25, fit=0.84),
-    "wizard":  dict(base=0.30, fit=1.10, squash=0.62, hide=True),
-    "cap":     dict(base=0.25, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81)),
+    "crown":   dict(base=0.15, fit=0.80),
+    "wizard":  dict(base=0.24, fit=0.90, squash=0.62, hide=True),
+    "cap":     dict(base=0.25, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81), dx=-70),
     "flowers": dict(base=0.21, fit=1.14, squash=0.95, ring=True),
 }
 # Per-head corrections, checked one by one on the review sheets: dy moves the hat down (head px), fit scales it.
@@ -28,9 +28,10 @@ FIX = {
     ("crown", "tabaxi_m"): dict(fit=0.7), ("crown", "tabaxi_f"): dict(fit=0.7),
     ("crown", "dragonborn_m"): dict(fit=0.72), ("crown", "dragonborn_f"): dict(fit=0.72),
     ("wizard", "tabaxi_m"): dict(fit=0.95), ("wizard", "tabaxi_f"): dict(fit=0.9),
-    ("wizard", "dragonborn_m"): dict(fit=0.72), ("wizard", "dragonborn_f"): dict(fit=0.72),
-    ("cap", "tabaxi_m"): dict(fit=1.0), ("cap", "tabaxi_f"): dict(fit=1.0),
-    ("flowers", "tabaxi_m"): dict(fit=0.95), ("flowers", "tabaxi_f"): dict(fit=0.95),
+    ("wizard", "dragonborn_m"): dict(fit=0.85), ("wizard", "dragonborn_f"): dict(fit=0.85),
+    ("cap", "tabaxi_m"): dict(fit=1.0, dx=0), ("cap", "tabaxi_f"): dict(fit=1.0, dx=0),
+    ("cap", "dragonborn_m"): dict(dx=0), ("cap", "dragonborn_f"): dict(dx=0),
+    ("flowers", "tabaxi_m"): dict(fit=0.95, dy=-95, squash=0.6), ("flowers", "tabaxi_f"): dict(fit=0.95, dy=-95, squash=0.6),
 }
 
 def load_hat(name):
@@ -52,7 +53,7 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
     s = w / hat_img.width
     hi = hat_img.resize((w, max(1, int(hat_img.height * s * p.get("squash", 1)))), Image.LANCZOS)
     cx = (x0 + x1) // 2 if not head_name.startswith(KEEP_TOP) else sk["cx"]
-    x = cx - int(w * p.get("anchor", 0.5))
+    x = cx - int(w * p.get("anchor", 0.5)) + p.get("dx", 0)
     out = Image.new("RGBA", (head_img.width, head_img.height + PAD), (0, 0, 0, 0))
     head = head_img
     if p.get("ring"):       # the far half of the ring goes behind the head, the near half in front
@@ -72,11 +73,11 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
         hd = np.asarray(head).copy()
         for X in range(hd.shape[1]):
             c = X - x
-            if c in bottoms: yb = bottoms[c]
-            elif c < cols[0]: yb = bottoms[cols[0]]
-            elif c > cols[-1]: yb = bottoms[cols[-1]]
+            if c in bottoms: yb = bottoms[c]; lift = 28
+            elif c < cols[0]: yb = bottoms[cols[0]]; lift = 0
+            elif c > cols[-1]: yb = bottoms[cols[-1]]; lift = 0
             else: continue
-            cut = y + yb - 28 - PAD          # in head coordinates: a little above the hat's bottom edge
+            cut = y + yb - lift - PAD        # in head coordinates: under the hat, a little above its bottom edge
             if cut > 0: hd[:cut, X, 3] = 0
         head = Image.fromarray(hd, "RGBA")
     out.alpha_composite(head, (0, PAD)); out.alpha_composite(hi, (x, y))
