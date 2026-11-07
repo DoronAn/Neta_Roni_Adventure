@@ -20,7 +20,7 @@ KEEP_TOP = ("tabaxi", "dragonborn")   # cat ears and horns stay visible beside a
 HATS = {
     "crown":   dict(base=0.15, fit=0.80),
     "wizard":  dict(base=0.24, fit=0.90, squash=0.62, hide=True),
-    "cap":     dict(base=0.25, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81), dx=-70),
+    "cap":     dict(base=0.18, fit=1.22, hide=True, anchor=0.41, edge=(0.0, 0.81)),
     "flowers": dict(base=0.21, fit=1.14, squash=0.95, ring=True),
 }
 # Per-head corrections, checked one by one on the review sheets: dy moves the hat down (head px), fit scales it.
@@ -29,9 +29,8 @@ FIX = {
     ("crown", "dragonborn_m"): dict(fit=0.72), ("crown", "dragonborn_f"): dict(fit=0.72),
     ("wizard", "tabaxi_m"): dict(fit=0.95), ("wizard", "tabaxi_f"): dict(fit=0.9),
     ("wizard", "dragonborn_m"): dict(fit=0.85), ("wizard", "dragonborn_f"): dict(fit=0.85),
-    ("cap", "tabaxi_m"): dict(fit=1.0, dx=0), ("cap", "tabaxi_f"): dict(fit=1.0, dx=0),
-    ("cap", "dragonborn_m"): dict(dx=0), ("cap", "dragonborn_f"): dict(dx=0),
-    ("flowers", "tabaxi_m"): dict(fit=0.95, dy=-95, squash=0.6), ("flowers", "tabaxi_f"): dict(fit=0.95, dy=-95, squash=0.6),
+    ("cap", "tabaxi_m"): dict(fit=1.0), ("cap", "tabaxi_f"): dict(fit=1.0),
+    ("flowers", "tabaxi_m"): dict(fit=0.70, dy=-62, squash=0.5), ("flowers", "tabaxi_f"): dict(fit=0.70, dy=-77, squash=0.5),
 }
 
 def load_hat(name):
@@ -61,8 +60,13 @@ def head_with_hat(head_img, head_name, hat, hat_img, chins, skulls):
         a = np.asarray(hi)
         back = a.copy(); back[hi.height // 2:, :, 3] = 0
         front = a.copy(); front[:hi.height // 2, :, 3] = 0
-        out.alpha_composite(Image.fromarray(back, "RGBA"), (x, y)); out.alpha_composite(head, (0, PAD))
-        out.alpha_composite(Image.fromarray(front, "RGBA"), (x, y))
+        back, front = Image.fromarray(back, "RGBA"), Image.fromarray(front, "RGBA")
+        if p.get("tilt"):
+            back = back.rotate(p["tilt"], resample=Image.BICUBIC, expand=True)
+            front = front.rotate(p["tilt"], resample=Image.BICUBIC, expand=True)
+            x -= (back.width - hi.width) // 2; y -= (back.height - hi.height) // 2
+        out.alpha_composite(back, (x, y)); out.alpha_composite(head, (0, PAD))
+        out.alpha_composite(front, (x, y))
         return out
     y = PAD + base - hi.height
     if p.get("hide") and not head_name.startswith(KEEP_TOP):
