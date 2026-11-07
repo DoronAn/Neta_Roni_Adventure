@@ -40,15 +40,21 @@
   window.addEventListener("popstate", (e) => { if (e.state && e.state.step) { set({ step: e.state.step }); render(); } });
 
   function top() {
-    const i = DOTTED.indexOf(hero.step);
-    const dots = DOTTED.map((s, j) => `<i class="${j < i ? "on" : j === i ? "now" : ""}"></i>`).join("");
-    return `<div class="top"><button class="back" data-act="back" aria-label="חזרה">→</button><div class="dots">${dots}</div></div>`;
+    const i = hero.step === "done" ? DOTTED.length : DOTTED.indexOf(hero.step);
+    const stars = DOTTED.map((st, j) => UI.star(j < i ? "on" : j === i ? "now" : "")).join("");
+    const crest = kid() ? `<img class="crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">` : `<span class="crest none"></span>`;
+    return `<div class="top"><button class="back" data-act="back" aria-label="חזרה">→</button><div class="progress">${stars}</div>${crest}</div>`;
   }
+  // A chapter heading: "פרק ג׳", the title (a word in <em> turns red), and a star divider unless it's tight.
+  const head = (title, divider = true) =>
+    `<p class="kicker">${UI.chapter(DOTTED.indexOf(hero.step))}</p><h2>${title}</h2>${divider ? UI.stars() : ""}`;
   const bar = (label, enabled = true, act = "next", inline = false) =>
-    `<div class="bar${inline ? " inline" : ""}"><div><button class="btn" data-act="${act}" ${enabled ? "" : "disabled"}>${label}</button></div></div>`;
+    `<div class="bar${inline ? " inline" : ""}"><button class="btn" data-act="${act}" ${enabled ? "" : "disabled"}>${label}</button></div>`;
 
   // Draws the hero (or part of it) on every canvas carrying data-hero, once the page has laid them out.
   function paint() {
+    // a sideways row keeps the chosen card in sight after the screen redraws
+    app.querySelectorAll(".strip .card.on").forEach((c) => c.scrollIntoView({ block: "nearest", inline: "center" }));
     requestAnimationFrame(() => {
       app.querySelectorAll("canvas[data-hero]").forEach((cv) => {
         const h = { ...hero, ...JSON.parse(cv.dataset.hero) };
@@ -59,76 +65,71 @@
   }
   const canvas = (h, part, cls = "", frame = "") =>
     `<canvas class="${cls}" data-hero='${esc(JSON.stringify(h))}' data-part="${part}" ${frame ? `data-frame="${frame}"` : ""}></canvas>`;
+  const portrait = (small = false) => `<div class="stage${small ? " small" : ""}">${canvas({}, "all")}</div>`;
 
   // ---------- the screens ----------
   const SCREENS = {
     legend() {
       return `<section class="legend">
-        <svg class="shield" viewBox="0 0 150 170" aria-hidden="true">
-          <g fill="#c8962e" stroke="#2b1d14" stroke-width="4" stroke-linejoin="round">
-            <path d="M75 8 L136 28 Q138 98 75 160 Z" transform="translate(6,4)"/>
-            <path d="M75 8 L14 28 Q12 98 75 160 Z" transform="translate(-6,-2) rotate(-4 75 80)"/>
-          </g>
-          <g fill="none" stroke="#2b1d14" stroke-width="3" stroke-linecap="round">
-            <path d="M81 40 L74 62 L84 78 L72 100" transform="translate(6,4)"/>
-            <path d="M44 50 L58 66" /><path d="M104 104 L116 92" />
-          </g>
-        </svg>
-        <h1>המגן השבור</h1>
-        <p>לפני הרבה מאוד שנים, מגן קסום שמר על הממלכה ונתן לה כוח גדול.</p>
-        <p>אבל יום אחד שתי המלכות, שתי אחיות, רבו זו עם זו, והמגן נשבר. השברים שלו התפזרו בכל רחבי הממלכה.</p>
-        <p>האגדה מספרת שיבוא יום, ותגיע חבורה של גיבורים ישרי לב, שתמצא את השברים ותאחד את הממלכה מחדש.</p>
-        <p class="call">נטע ורוני יוצאות למסע וקוראות לגיבורים להצטרף אליהן.</p>
-        ${bar("יוצאים לדרך!", true, "next", true)}
+        <p class="call">הרפתקנים מכל קצוות הממלכה</p>
+        <div class="scene">${UI.castle("castle")}${UI.shield("shield")}${UI.HAS.dragon ? `<img class="dragon" src="ui/dragon.webp" alt="">` : ""}</div>
+        <h1>המגן <em>השבור</em></h1>
+        ${UI.stars()}
+        <div class="text">
+          ${UI.stamp(["דרושים", "גיבורים"], "stamp")}
+          <p>לפני הרבה מאוד שנים, מגן קסום שמר על הממלכה ונתן לה כוח גדול.</p>
+          <p>אבל יום אחד שתי המלכות, שתי אחיות, רבו זו עם זו, והמגן נשבר. השברים שלו התפזרו בכל רחבי הממלכה.</p>
+          <p>האגדה מספרת שיבוא יום, ותגיע חבורה של גיבורים ישרי לב, שתמצא את השברים ותאחד את הממלכה מחדש.</p>
+        </div>
+        <p class="call big">נטע ורוני יוצאות למסע<br>וקוראות לגיבורים להצטרף אליהן!</p>
+        ${bar("יוצאים למסע!", true, "next", true)}
       </section>`;
     },
 
     kid() {
       const team = (k) => `<div class="team ${k}">
-          <div class="team-head"><img src="${PARTS.crests[k]}" alt=""><h3>${TEAMS[k].he}</h3></div>
+          <div class="team-head"><img src="${PARTS.crests[k]}" alt=""><span class="ribbon">${TEAMS[k].he}</span></div>
           <div class="names">${KIDS.map((c, i) => (c.team === k ? `<button class="card ${hero.kid === i ? "on" : ""}" data-act="kid" data-v="${i}">${esc(c.name)}</button>` : "")).join("")}</div>
         </div>`;
-      return `${top()}<h2>איך קוראים לך?</h2><p class="sub">לחצו על השם שלכם</p>${team("neta")}${team("roni")}`;
+      return `${top()}${head("איך <em>קוראים</em> לך?")}${team("neta")}${team("roni")}`;
     },
 
     gender() {
-      return `${top()}<h2>${esc(kid().name)}, מי יוצא למסע?</h2>
-        <div class="genders">
-          <button class="card ${hero.gender === "m" ? "on" : ""}" data-act="gender" data-v="m">גיבור</button>
-          <button class="card ${hero.gender === "f" ? "on" : ""}" data-act="gender" data-v="f">גיבורה</button>
-        </div>`;
+      const card = (v, label) => `<button class="card ${hero.gender === v ? "on" : ""}" data-act="gender" data-v="${v}">
+          ${canvas({ species: "human", gender: v, hat: "none" }, "head", "sq", "fit")}<div class="name">${label}</div></button>`;
+      return `${top()}${head(`${esc(kid().name)}, מי יוצא <em>למסע</em>?`)}<div class="genders">${card("m", "גיבור")}${card("f", "גיבורה")}</div>`;
     },
 
     species() {
       const cards = Object.keys(CATALOG.species).map((k) => `<button class="card ${hero.species === k ? "on" : ""}" data-act="species" data-v="${k}">
           ${canvas({ species: k, hat: "none" }, "head", "sq", "fit")}
           <div class="name">${speciesName(k)}</div><div class="desc">${CATALOG.species[k].desc_he[g()]}</div></button>`).join("");
-      return `${top()}<h2>${t("בחר את העם שלך", "בחרי את העם שלך")}</h2><div class="grid">${cards}</div>`;
+      return `${top()}${head(`${t("בחר", "בחרי")} את <em>העם</em> שלך`)}<div class="grid">${cards}</div>`;
     },
 
     cls() {
       const cards = Object.keys(CATALOG.classes).map((k) => `<button class="card ${hero.cls === k ? "on" : ""}" data-act="cls" data-v="${k}">
           ${canvas({ cls: k, colour: "original" }, "body", "tall", "fit")}
           <div class="name">${className(k)}</div><div class="desc">${CATALOG.classes[k].desc_he[g()]}</div></button>`).join("");
-      return `${top()}<h2>${t("מה אתה יודע לעשות הכי טוב?", "מה את יודעת לעשות הכי טוב?")}</h2><div class="grid three">${cards}</div>`;
+      return `${top()}${head(`מה ${t("אתה יודע", "את יודעת")} <em>הכי טוב</em>?`)}<div class="grid three">${cards}</div>`;
     },
 
     colour() {
       const sw = Object.keys(CATALOG.outfit_colors).map((k) => `<button class="swatch ${hero.colour === k ? "on" : ""}" data-act="colour" data-v="${k}">
           <b style="background:${PARTS.swatch[`${hero.cls}/${k}`]}"></b><span>${CATALOG.outfit_colors[k]}</span></button>`).join("");
-      return `${top()}<div class="stage">${canvas({}, "all")}</div><h2>באיזה צבע הבגדים?</h2><div class="swatches">${sw}</div>${bar("המשך")}`;
+      return `${top()}${portrait()}${head("באיזה <em>צבע</em> הבגדים?", false)}<div class="swatches">${sw}</div>${bar("המשך")}`;
     },
 
     hat() {
       const cards = Object.keys(CATALOG.headwear).map((k) => `<button class="card ${hero.hat === k ? "on" : ""}" data-act="hat" data-v="${k}">
           ${canvas({ hat: k }, "head", "sq", "fit")}<div class="name">${CATALOG.headwear[k]}</div></button>`).join("");
-      return `${top()}<div class="stage">${canvas({}, "all")}</div><h2>מה על הראש?</h2><div class="grid three">${cards}</div>${bar("המשך")}`;
+      return `${top()}${portrait()}${head("מה על <em>הראש</em>?", false)}<div class="strip">${cards}</div>${bar("המשך")}`;
     },
 
     pet() {
       const cards = Object.keys(CATALOG.companions).map((k) => `<button class="card ${hero.pet === k ? "on" : ""}" data-act="pet" data-v="${k}">
           ${k === "none" ? `<div class="none-pet"></div>` : `<img src="${PARTS.pets[k].src}" alt="">`}<div class="name">${CATALOG.companions[k]}</div></button>`).join("");
-      return `${top()}<div class="stage">${canvas({}, "all")}</div><h2>מי מצטרף אליך למסע?</h2><div class="grid three pets">${cards}</div>${bar("המשך")}`;
+      return `${top()}${portrait()}${head("מי <em>מצטרף</em> אליך?", false)}<div class="strip">${cards}</div>${bar("המשך")}`;
     },
 
     strengths() {
@@ -136,21 +137,20 @@
       const cards = Object.keys(CATALOG.abilities).map((k) => {
         const a = CATALOG.abilities[k], on = hero.strengths.includes(k);
         return `<button class="card strength ${on ? "on" : ""}" data-act="strength" data-v="${k}">
-          ${sug.includes(k) ? `<span class="tag">⭐ מתאים ל${className()}</span>` : ""}
-          <div class="name">${a.he}</div><div class="desc">${a.desc_he}</div></button>`;
+          ${sug.includes(k) ? `<span class="tag">★ מתאים ל${className()}</span>` : ""}
+          ${UI.icon(k)}<div class="name">${a.he}</div><div class="desc">${a.desc_he}</div></button>`;
       }).join("");
       const n = hero.strengths.length;
-      return `${top()}<h2>${t("במה אתה הכי חזק?", "במה את הכי חזקה?")}</h2>
+      return `${top()}${head(`במה ${t("אתה", "את")} <em>${t("הכי חזק", "הכי חזקה")}</em>?`)}
         <p class="count">${n === 2 ? "מעולה!" : `${t("בחר", "בחרי")} עוד ${n === 1 ? "אחת" : "שתיים"}`}</p>
         <div class="grid">${cards}</div>${bar("המשך", n === 2)}`;
     },
 
     name() {
-      return `${top()}<div class="stage small">${canvas({}, "all")}</div>
-        <h2>${t("איך קוראים לגיבור שלך?", "איך קוראים לגיבורה שלך?")}</h2>
+      return `${top()}${portrait(true)}${head(`איך קוראים ${t("לגיבור", "לגיבורה")} <em>שלך</em>?`, false)}
         <input class="field" id="hero-name" maxlength="24" autocomplete="off" enterkeyhint="done"
                placeholder="${t("שם הגיבור", "שם הגיבורה")}" value="${esc(hero.name)}">
-        <div class="row"><button class="btn ghost small" data-act="suggest">הצעה לשם ✨</button></div>
+        <div class="row"><button class="btn ghost small" data-act="suggest">✦ הצעה לשם</button></div>
         <p class="hint">${t("השם יופיע על כרטיס הגיבור", "השם יופיע על כרטיס הגיבורה")}</p>
         ${bar("המשך", hero.name.trim().length > 0)}`;
     },
@@ -158,22 +158,22 @@
     homeland() {
       if (!hero.homeland) set({ homeland: pick(Object.keys(CATALOG.homelands)) });
       const cards = Object.keys(CATALOG.homelands).map((k) => `<button class="card ${hero.homeland === k ? "on" : ""}" data-act="homeland" data-v="${k}">
-          <div class="name">${CATALOG.homelands[k].he}</div></button>`).join("");
-      return `${top()}<h2>${t("מאיפה אתה בא?", "מאיפה את באה?")}</h2><div class="homes">${cards}</div>
-        <div class="story">${esc(draftStory())}</div>${bar("סיימתי!")}`;
+          ${UI.icon(k)}<div class="name">${CATALOG.homelands[k].he}</div></button>`).join("");
+      return `${top()}${head(`מאיפה ${t("אתה", "את")} <em>${t("בא", "באה")}</em>?`)}<div class="homes">${cards}</div>
+        <div class="scroll">${esc(draftStory())}</div>${bar("סיימתי!")}`;
     },
 
     done() {
       let code = "";
       try { code = HeroCode.encode(hero); } catch (e) { console.warn(e); }
-      const str = hero.strengths.map((k) => CATALOG.abilities[k].he).join(" · ");
-      return `<section class="done">${canvas({}, "all")}
-        <div class="hero-name">${esc(hero.name)}</div>
+      const seals = hero.strengths.map((k) => `<div class="seal"><i>${UI.icon(k)}</i>${CATALOG.abilities[k].he}</div>`).join("");
+      return `<section class="done">${top()}${portrait()}
+        <div class="banner"><span>${esc(hero.name)}</span></div>
         <p class="what">${speciesName()} · ${className()}</p>
-        <p class="str">${str}</p>
+        <div class="seals">${seals}</div>
         ${code ? `<span class="code">${code}</span>` : ""}
         <div class="stack">
-          <button class="btn ghost" data-act="edit">לשנות משהו</button>
+          <button class="btn ghost small" data-act="edit">לשנות משהו</button>
           <button class="btn ghost small" data-act="restart">להתחיל מחדש</button>
         </div></section>`;
     },

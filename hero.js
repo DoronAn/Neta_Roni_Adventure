@@ -57,8 +57,6 @@ const HeroArt = (() => {
     return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
   }
 
-  // A frame that fits every hero, so the figure doesn't jump as a hat or a companion is added.
-  const FULL_FRAME = [-10, -560, 1150, 1030];
 
   // Draws hero h on a canvas, fitted inside it and standing on its bottom edge.
   // opts.part as in layers(); opts.frame: [x0, y0, x1, y1] in hero space, or "fit" to frame the layers tightly.
@@ -66,13 +64,19 @@ const HeroArt = (() => {
     const part = opts.part || "all";
     const ls = layers(h, part);
     const ims = await Promise.all(ls.map((l) => load(l.src)));
-    let frame = opts.frame || (part === "all" ? FULL_FRAME : "fit");
+    // "fit": tight around the layers. The whole hero ("all") is framed tight too, but kept centred on the body, so
+    // a companion at the right foot doesn't push the hero sideways, with a little air around it.
+    let frame = opts.frame || "fit";
     if (frame === "fit") {
       frame = [Infinity, Infinity, -Infinity, -Infinity];
       ims.forEach((im, i) => {
         const r = rect(im, ls[i].m);
         frame = [Math.min(frame[0], r[0]), Math.min(frame[1], r[1]), Math.max(frame[2], r[2]), Math.max(frame[3], r[3])];
       });
+      if (part === "all") {
+        const half = Math.max(512 - frame[0], frame[2] - 512), air = (frame[3] - frame[1]) * 0.04;
+        frame = [512 - half - air, frame[1] - air, 512 + half + air, frame[3] + air * 0.5];
+      }
     }
     const dpr = opts.dpr || window.devicePixelRatio || 1;
     const cw = canvas.clientWidth || canvas.width, ch = canvas.clientHeight || canvas.height;

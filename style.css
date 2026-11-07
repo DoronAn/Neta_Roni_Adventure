@@ -1,174 +1,242 @@
-/* Parchment and ink, to sit with the woodcut pictures. Big tap targets: some of the kids are six. */
+/* An old adventure poster, after the party invitation: aged paper, a red and navy frame, condensed headlines
+   in navy and red, gold for the treasure. Big tap targets: some of the kids are six. */
 
-@font-face { font-family: "Secular One"; src: url("fonts/SecularOne_400Regular.ttf") format("truetype"); font-display: swap; }
-@font-face { font-family: "Heebo"; font-weight: 700; src: url("fonts/Heebo_700Bold.ttf") format("truetype"); font-display: swap; }
 @font-face { font-family: "Karantina"; font-weight: 700; src: url("fonts/Karantina_700Bold.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Heebo"; font-weight: 700; src: url("fonts/Heebo_700Bold.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Secular One"; src: url("fonts/SecularOne_400Regular.ttf") format("truetype"); font-display: swap; }
 
 :root {
-  --parchment: #f3e7cc;
-  --paper: #fbf4e3;
-  --ink: #2b1d14;
-  --muted: #6b5a48;
-  --line: #d9c7a1;
-  --gold: #c8962e;
-  --team: #8c2f2f;          /* before a team is known */
-  --team-soft: #f1dcd6;
-  --radius: 16px;
+  --paper: #f0e4c8;
+  --card: #f8f0dd;
+  --navy: #1f3460;
+  --navy-2: #2d4a82;
+  --red: #c4262e;
+  --red-dark: #8f1a20;
+  --gold: #d4a53a;
+  --ink: #1f2c4d;
+  --muted: #5a6482;
+  --line: #c9b58c;
+  --team: var(--red);
+  --frame: 14px;
   color-scheme: light;
 }
-body.team-neta { --team: #1d7f80; --team-soft: #d5ecea; }
-body.team-roni { --team: #d0691b; --team-soft: #f8e1cc; }
+body.team-neta { --team: #17797a; }
+body.team-roni { --team: #d0641b; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.55), transparent 60%),
-    radial-gradient(ellipse at 50% 120%, rgba(160, 120, 60, 0.18), transparent 60%),
-    var(--parchment);
-  background-attachment: fixed;
+  background: var(--paper) url("ui/parchment.jpg") repeat;
+  background-size: 300px;
   color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  font-family: "Heebo", system-ui, -apple-system, Arial, sans-serif;
+  font-weight: 700;
   font-size: 17px;
-  line-height: 1.5;
+  line-height: 1.45;
   -webkit-tap-highlight-color: transparent;
-  min-height: 100vh;
-  min-height: 100dvh;
+}
+
+/* the poster's frame: red band, paper, navy line; the paper browns toward the edges */
+.frame {
+  position: fixed; inset: 0; pointer-events: none; z-index: 40;
+  box-shadow:
+    inset 0 0 0 6px var(--red),
+    inset 0 0 0 9px #f3e6c8,
+    inset 0 0 0 12px var(--navy),
+    inset 0 0 70px 14px rgba(140, 95, 40, 0.30);
 }
 
 #app {
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 12px 16px calc(110px + env(safe-area-inset-bottom));
-  min-height: 100vh;
-  min-height: 100dvh;
+  max-width: 560px; margin: 0 auto;
+  min-height: 100vh; min-height: 100dvh;
+  padding: calc(var(--frame) + 6px) calc(var(--frame) + 10px) 0;
+  display: flex; flex-direction: column;
 }
 
-/* ---- top bar ---- */
-.top { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-bottom: 6px; }
+/* ---- top bar: back coin, progress stars, the team's crest ---- */
+.top { display: flex; align-items: center; gap: 8px; min-height: 44px; }
 .back {
-  border: 0; background: none; color: var(--ink); font: 700 26px/1 "Heebo", sans-serif;
-  width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+  flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--navy); color: #f3e6c8; font: 700 22px/1 "Heebo", sans-serif;
+  box-shadow: inset 0 0 0 2px var(--navy), inset 0 0 0 4px var(--gold), 0 2px 0 rgba(0, 0, 0, 0.25);
 }
-.back:active { background: var(--line); }
-.dots { display: flex; gap: 6px; flex: 1; justify-content: center; padding-left: 44px; }
-.dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
-.dots i.on { background: var(--team); }
-.dots i.now { background: var(--team); transform: scale(1.5); }
+.back:active { transform: translateY(1px); }
+.progress { flex: 1; display: flex; justify-content: center; gap: 4px; }
+.progress svg { width: 13px; height: 13px; fill: none; stroke: var(--navy); stroke-width: 1.4; opacity: 0.45; }
+.progress svg.on { fill: var(--red); stroke: var(--red); opacity: 1; }
+.progress svg.now { fill: var(--gold); stroke: var(--navy); opacity: 1; transform: scale(1.45); }
+.crest { flex: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 0 2px var(--navy); }
+.crest.none { visibility: hidden; }
 
-h1, h2 { font-family: "Secular One", "Heebo", sans-serif; font-weight: 400; margin: 6px 0 4px; line-height: 1.2; }
-h1 { font-size: 30px; }
-h2 { font-size: 26px; text-align: center; }
-.sub { text-align: center; color: var(--muted); margin: 0 0 14px; }
-
-/* ---- the legend ---- */
-.legend { text-align: center; padding-top: 18px; }
-.legend h1 { font-family: "Karantina", "Secular One", sans-serif; font-weight: 700; font-size: 64px; letter-spacing: 1px; margin: 4px 0 0; }
-.legend .shield { width: 150px; height: 170px; margin: 6px auto 4px; display: block; }
-.legend p { margin: 0 0 12px; font-size: 18px; }
-.legend .call { font-family: "Secular One", sans-serif; font-size: 20px; color: var(--team); }
+/* ---- headings ---- */
+.kicker { text-align: center; color: var(--red); font-size: 15px; letter-spacing: 0.5px; margin: 6px 0 0; }
+h2 {
+  font: 700 46px/0.95 "Karantina", "Secular One", sans-serif; color: var(--navy);
+  text-align: center; margin: 2px 0 6px;
+}
+h2 em { font-style: normal; color: var(--red); }
+.divider { display: block; width: 190px; height: 16px; margin: 4px auto 12px; }
 
 /* ---- buttons ---- */
 .btn {
-  display: block; width: 100%; border: 0; border-radius: var(--radius); cursor: pointer;
-  font: 700 21px/1.2 "Heebo", sans-serif; padding: 16px 18px; color: #fff; background: var(--team);
-  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  display: block; width: 100%; border: 0; border-radius: 12px; cursor: pointer;
+  font: 700 30px/1 "Karantina", "Heebo", sans-serif; letter-spacing: 0.5px;
+  padding: 14px 18px 12px; color: #fbf1dc; background: var(--red);
+  outline: 2px dashed rgba(251, 241, 220, 0.75); outline-offset: -7px;
+  box-shadow: 0 4px 0 var(--red-dark), 0 6px 12px rgba(80, 30, 10, 0.25);
 }
-.btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25); }
-.btn:disabled { background: #b9ad97; box-shadow: none; cursor: default; }
-.btn.ghost { background: transparent; color: var(--team); box-shadow: inset 0 0 0 2px var(--team); }
-.btn.small { font-size: 17px; padding: 11px 14px; }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--red-dark); }
+.btn:disabled { background: #b8ab94; outline-color: rgba(255, 255, 255, 0.5); box-shadow: 0 4px 0 #8f8471; cursor: default; }
+.btn.ghost { background: transparent; color: var(--navy); outline: 0; box-shadow: inset 0 0 0 2.5px var(--navy); font-size: 26px; }
+.btn.small { font-size: 22px; padding: 10px 14px 8px; }
 .bar {
-  position: fixed; inset: auto 0 0 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, var(--parchment) 70%, rgba(243, 231, 204, 0));
+  position: sticky; bottom: 0; z-index: 5; margin: auto calc(-1 * var(--frame) - 10px) 0;
+  padding: 12px calc(var(--frame) + 10px) calc(var(--frame) + 10px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(240, 228, 200, 0.97) 75%, rgba(240, 228, 200, 0));
 }
-.bar > div { max-width: 528px; margin: 0 auto; }
-.bar.inline { position: static; background: none; padding: 8px 0 0; }
+.bar.inline { position: static; background: none; margin: 14px 0 0; padding: 0 0 calc(var(--frame) + 12px); }
 
 /* ---- choice cards ---- */
-.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.grid.three { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 8px; }
+.grid.three { grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .card {
   position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
-  background: var(--paper); border: 2px solid var(--line); border-radius: var(--radius);
-  padding: 10px 8px 12px; cursor: pointer; color: var(--ink); font: inherit;
+  background: var(--card); border: 2px solid var(--navy); border-radius: 12px;
+  padding: 8px 6px 10px; cursor: pointer; color: var(--ink); font: inherit;
+  box-shadow: 3px 3px 0 rgba(31, 52, 96, 0.22);
 }
-.card:active { transform: scale(0.98); }
-.card.on { border-color: var(--team); box-shadow: 0 0 0 3px var(--team-soft), 0 0 0 5px var(--team); }
+.card:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(31, 52, 96, 0.22); }
+.card.on { border: 3px solid var(--red); box-shadow: 3px 3px 0 var(--red-dark); background: #fbf3e2; }
+.card.on::after {          /* the chosen card gets a red stamp with a tick */
+  content: ""; position: absolute; top: -10px; left: -10px; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--red) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fbf1dc' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/22px no-repeat;
+  box-shadow: 0 0 0 2px #fbf1dc, 0 0 0 4px var(--red); transform: rotate(-12deg);
+}
 .card canvas, .card img { width: 100%; display: block; }
 .card canvas.sq { aspect-ratio: 1; }
 .card canvas.tall { aspect-ratio: 3 / 4; }
-.pets .card img, .pets .none-pet { aspect-ratio: 1; object-fit: contain; }
-.none-pet { width: 100%; border: 3px dashed var(--line); border-radius: 50%; }
-.card .name { font: 700 19px/1.2 "Heebo", sans-serif; margin-top: 6px; }
-.card .desc { font-size: 14px; color: var(--muted); line-height: 1.3; margin-top: 3px; }
-.three .card .name { font-size: 16px; }
-.three .card .desc { font-size: 12.5px; }
-.strength { padding-top: 30px; }
-.tag {
-  position: absolute; top: 7px; right: 50%; transform: translateX(50%); white-space: nowrap; background: var(--gold); color: #fff;
-  font: 700 12px/1 "Heebo", sans-serif; padding: 4px 7px; border-radius: 10px;
-}
+.card .name { font: 700 27px/1 "Karantina", "Heebo", sans-serif; color: var(--navy); margin-top: 4px; }
+.card .desc { font-size: 13px; color: var(--muted); line-height: 1.25; margin-top: 3px; }
+.three .card .name { font-size: 23px; }
+.three .card .desc { font-size: 11.5px; }
+
+/* ---- the legend: a poster ---- */
+.legend { text-align: center; position: relative; }
+.legend .scene { position: relative; height: 190px; margin: 4px 0 0; }
+.legend .scene .shield { position: absolute; left: 50%; top: 0; width: 180px; height: 180px; transform: translateX(-50%); }
+.legend .scene .castle { position: absolute; left: -6px; bottom: 6px; width: 110px; opacity: 0.9; }
+.legend .scene .dragon { position: absolute; right: -8px; top: 6px; width: 120px; }
+.legend .call { color: var(--red); font-size: 16px; margin: 4px 0 0; }
+.legend h1 { font: 700 80px/0.86 "Karantina", sans-serif; color: var(--navy); margin: 2px 0 2px; }
+.legend h1 em { font-style: normal; color: var(--red); }
+.legend p { margin: 0 0 10px; color: var(--ink); }
+.legend .stamp { float: left; width: 92px; height: 92px; margin: 0 2px 4px 8px; transform: rotate(-14deg); shape-outside: circle(50%); opacity: 0.92; }
+.legend .call.big { font-size: 19px; line-height: 1.3; margin: 6px 0 0; clear: both; }
+.legend .text { padding: 0 4px; }
+.legend .text::after { content: ""; display: block; clear: both; }
 
 /* ---- who are you ---- */
-.team { margin: 6px 0 18px; }
-.team-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.team-head img { width: 56px; height: 56px; }
-.team-head h3 { font: 400 22px/1.2 "Secular One", sans-serif; margin: 0; }
-.names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.names .card { padding: 14px 8px; font: 700 21px/1.2 "Heebo", sans-serif; }
-.team.neta .card { border-color: #9ccfcd; }
-.team.roni .card { border-color: #efc49c; }
-
-.genders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
-.genders .card { padding: 26px 8px; font: 400 30px/1.2 "Secular One", sans-serif; }
-
-/* ---- the hero preview ---- */
-.stage {
-  position: sticky; top: 0; z-index: 2; margin: 0 -16px 10px; padding: 4px 16px 8px;
-  background: linear-gradient(to bottom, var(--parchment) 85%, rgba(243, 231, 204, 0));
+.team { margin: 4px 0 16px; }
+.team-head { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 10px; }
+.team-head img { width: 54px; height: 54px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--navy), 0 0 0 5px var(--gold); }
+.ribbon {
+  position: relative; display: inline-block; color: #fbf1dc; padding: 6px 22px 3px;
+  font: 700 28px/1 "Karantina", sans-serif; background: var(--tc, var(--red));
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 50%, 100% 100%, 0 100%, 12px 50%);
 }
-.stage canvas { width: 100%; height: min(34vh, 300px); display: block; }
-.stage.small { position: static; }
-.stage.small canvas { height: min(24vh, 200px); }
+.team.neta { --tc: #17797a; }
+.team.roni { --tc: #d0641b; }
+.names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.names .card { padding: 12px 6px 9px; font: 700 30px/1 "Karantina", sans-serif; color: var(--navy); border-color: var(--tc); }
 
-/* ---- colours ---- */
-.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 8px; }
-.swatch { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; cursor: pointer; font: inherit; color: var(--ink); }
-.swatch b { width: 54px; height: 54px; border-radius: 50%; border: 3px solid var(--paper); box-shadow: 0 0 0 2px var(--line); display: block; }
-.swatch.on b { box-shadow: 0 0 0 3px var(--team); }
-.swatch span { font-size: 14px; }
-.swatch.on span { font-weight: 700; }
+.genders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+.genders .card .name { font-size: 40px; }
+
+/* ---- the hero's portrait (colour, headwear, companion, name) ---- */
+.stage {
+  position: relative; flex: 1 1 auto; min-height: 210px; margin: 2px 6px 6px;
+  border: 3px solid var(--navy); border-radius: 48% 48% 14px 14px / 26% 26% 14px 14px;
+  background: radial-gradient(ellipse at 50% 60%, #fbf4e3 0%, #f3e7cb 60%, #e9d8b3 100%);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--gold), 4px 6px 0 6px rgba(31, 52, 96, 0.12);
+  display: flex; padding: 10px 8px 6px;
+}
+.stage::before {
+  content: ""; position: absolute; inset: 6px; border: 1.5px solid var(--red);
+  border-radius: inherit; pointer-events: none; opacity: 0.6;
+}
+.stage canvas { position: absolute; top: 16px; bottom: 8px; left: 10px; right: 10px; width: calc(100% - 20px); height: calc(100% - 24px); }
+.stage.small { flex: 0 0 auto; height: 190px; min-height: 0; }
+
+/* sideways rows of choices under the portrait */
+.strip { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px 12px 12px; margin: 0 -12px; scrollbar-width: none; }
+.strip::-webkit-scrollbar { display: none; }
+.strip .card { flex: 0 0 96px; scroll-snap-align: start; }
+.strip .card .name { font-size: 21px; }
+.strip .card img, .strip .none-pet { aspect-ratio: 1; object-fit: contain; }
+.none-pet { width: 100%; border: 3px dashed var(--line); border-radius: 50%; }
+
+/* ---- outfit colours: wax seals ---- */
+.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 4px; padding: 4px 0 6px; }
+.swatch { display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: 0; cursor: pointer; font: inherit; color: var(--ink); padding: 2px; }
+.swatch b {
+  position: relative; width: 50px; height: 50px; border-radius: 50%; display: block;
+  box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.18), inset 0 -6px 10px rgba(0, 0, 0, 0.22), inset 0 5px 8px rgba(255, 255, 255, 0.35), 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+.swatch.on b { box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.18), inset 0 -6px 10px rgba(0, 0, 0, 0.22), 0 0 0 3px var(--paper), 0 0 0 6px var(--red); }
+.swatch span { font-size: 13px; color: var(--muted); }
+.swatch.on span { color: var(--red); }
 
 /* ---- strengths ---- */
-.count { text-align: center; font: 700 17px "Heebo", sans-serif; color: var(--team); margin: -4px 0 12px; }
-.strength .name { font-size: 21px; }
+.count { text-align: center; color: var(--red); margin: -6px 0 10px; }
+.strength { padding: 12px 6px 10px; }
+.strength .icon { width: 44px; height: 44px; color: var(--navy); }
+.strength.on .icon { color: var(--red); }
+.tag {
+  position: absolute; top: -11px; right: 8px; white-space: nowrap;
+  background: var(--gold); color: var(--navy); font-size: 12px; padding: 2px 9px 1px; border-radius: 10px;
+  box-shadow: 0 0 0 2px var(--card);
+}
 
 /* ---- name ---- */
 .field {
-  width: 100%; font: 700 24px/1.3 "Heebo", sans-serif; padding: 14px 16px; border-radius: var(--radius);
-  border: 2px solid var(--line); background: var(--paper); color: var(--ink); text-align: center;
+  width: 100%; font: 700 34px/1.1 "Karantina", "Heebo", sans-serif; padding: 12px 14px 8px; border-radius: 12px;
+  border: 2.5px solid var(--navy); background: var(--card); color: var(--navy); text-align: center;
+  box-shadow: inset 0 2px 6px rgba(31, 52, 96, 0.12);
 }
-.field:focus { outline: none; border-color: var(--team); }
-.row { display: flex; gap: 10px; margin-top: 12px; }
-.hint { text-align: center; color: var(--muted); font-size: 14px; margin-top: 8px; }
+.field::placeholder { color: #a8a089; }
+.field:focus { outline: none; border-color: var(--red); }
+.row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.row .btn { width: auto; padding-inline: 22px; }
+.hint { text-align: center; color: var(--muted); font-size: 14px; margin: 8px 0 0; }
 
 /* ---- homeland and story ---- */
-.homes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.homes .card { padding: 12px 6px; }
-.homes .card .name { font-size: 17px; margin: 0; }
-.story {
-  margin-top: 16px; background: var(--paper); border: 2px dashed var(--line); border-radius: var(--radius);
-  padding: 14px 16px; font-size: 17px;
+.homes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.homes .card { padding: 10px 4px 8px; }
+.homes .icon { width: 40px; height: 40px; color: var(--navy); }
+.homes .card.on .icon { color: var(--red); }
+.homes .card .name { font-size: 21px; }
+.scroll {
+  position: relative; margin: 16px 4px 10px; padding: 16px 18px 14px; background: var(--card);
+  border: 2px solid var(--navy); border-radius: 6px; font-size: 16px; color: var(--ink);
+  box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5.5px var(--gold), 3px 3px 0 rgba(31, 52, 96, 0.2);
 }
 
-/* ---- done ---- */
-.done { text-align: center; }
-.done canvas { width: 100%; height: min(52vh, 440px); display: block; }
-.done .hero-name { font: 400 34px/1.15 "Secular One", sans-serif; margin: 6px 0 2px; color: var(--team); }
-.done .what { font: 700 19px "Heebo", sans-serif; margin: 0; }
-.done .str { color: var(--muted); margin: 2px 0 10px; }
-.code { display: inline-block; font: 700 18px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 2px; direction: ltr; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
-.stack { display: grid; gap: 10px; margin-top: 16px; }
+/* ---- the finished hero ---- */
+.done { text-align: center; display: flex; flex-direction: column; flex: 1; }
+.done .stage { min-height: 300px; }
+.banner { position: relative; z-index: 2; margin: -26px auto 6px; max-width: 92%; }
+.banner span {
+  display: inline-block; color: #fbf1dc; background: var(--red); padding: 10px 30px 5px;
+  font: 700 40px/1 "Karantina", sans-serif; letter-spacing: 0.5px;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 50%, 100% 100%, 0 100%, 16px 50%);
+  box-shadow: inset 0 0 0 2px var(--red-dark);
+}
+.done .what { font: 700 30px/1 "Karantina", sans-serif; color: var(--navy); margin: 4px 0; }
+.seals { display: flex; justify-content: center; gap: 16px; margin: 4px 0 8px; }
+.seal { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--navy); font-size: 14px; }
+.seal i { width: 50px; height: 50px; border-radius: 50%; background: var(--navy); color: var(--gold); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--gold); }
+.seal i .icon { width: 30px; height: 30px; }
+.code { display: inline-block; margin: 2px auto 0; font: 700 17px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 3px; direction: ltr; color: var(--navy); background: var(--card); border: 2px dashed var(--navy); border-radius: 8px; padding: 7px 12px 6px; }
+.stack { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 calc(var(--frame) + 12px); }
 
-.err { background: #fde8e4; border: 2px solid #d9826f; border-radius: var(--radius); padding: 12px; margin: 10px 0; text-align: center; }
+.err { background: #fde8e4; border: 2px solid var(--red); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
