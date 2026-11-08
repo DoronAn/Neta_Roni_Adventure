@@ -55,46 +55,50 @@ const HeroCard = (() => {
     ctx.lineWidth = 22; ctx.strokeStyle = C.a; ctx.strokeRect(11, 11, W - 22, H - 22);
     ctx.lineWidth = 6; ctx.strokeStyle = C.b; ctx.strokeRect(33, 33, W - 66, H - 66);
 
-    // The window: an arch onto the homeland, with the crest set into its top like a keystone. The mat, the gold line
-    // and the team line run around the arch and the crest as one shape (both drawn clockwise, so their union fills).
+    // The window: a gate. An arch onto the homeland, and at its top the crest in a medallion that the frame rings
+    // all the way round, above and below, so arch and crest are one piece. The frame, from the window outward: the
+    // team line, cream, the gold line, the cream mat; the medallion repeats it around the crest.
     const X = 90, Y = 150, WW = 1020, WH = 750, RY = 280;
-    const CR = 76, CX = W / 2, CY = Y + 6, CRING = CR + 12;
-    const shape = (grow) => {
-      arch(ctx, X - grow, Y - grow, WW + 2 * grow, WH + 2 * grow, RY + grow);
-      ctx.moveTo(CX + CRING + grow, CY); ctx.arc(CX, CY, CRING + grow, 0, 2 * Math.PI);
-    };
+    const CR = 72, CX = W / 2, CY = Y + 4;
+    const R = { rim: CR + 4, team: CR + 9, gap: CR + 13, gold: CR + 19, halo: CR + 26, mat: CR + 32 };
+    const disc = (r) => { ctx.moveTo(CX + r, CY); ctx.arc(CX, CY, r, 0, 2 * Math.PI); };
+    // the mat behind it all: the arch and the medallion as one shape (both drawn clockwise, so they unite)
     ctx.save(); ctx.shadowColor = "rgba(60,40,10,0.35)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
-    shape(22); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
-    shape(15); ctx.fillStyle = GOLD; ctx.fill();
-    shape(9); ctx.fillStyle = CARD; ctx.fill();
-    shape(5); ctx.fillStyle = C.b; ctx.fill();
+    arch(ctx, X - 22, Y - 22, WW + 44, WH + 44, RY + 22); disc(R.mat); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
+    // the arch's gold line and team line, running into the medallion's gold ring (drawn again after the medallion's halo)
+    const frameLines = () => {
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); disc(R.gold - 1); ctx.clip("evenodd");
+      arch(ctx, X - 12, Y - 12, WW + 24, WH + 24, RY + 12); ctx.lineWidth = 6; ctx.strokeStyle = GOLD; ctx.stroke();
+      arch(ctx, X - 2.5, Y - 2.5, WW + 5, WH + 5, RY + 2.5); ctx.lineWidth = 5; ctx.strokeStyle = C.b; ctx.stroke();
+      ctx.restore();
+    };
+    frameLines();
 
-    // The scene, paler than painted and lit behind the hero, so the hero stands out.
+    // The scene, brighter than painted (screened, so its colours stay clear) and lit behind the hero.
     ctx.save(); arch(ctx, X, Y, WW, WH, RY); ctx.clip();
     ctx.drawImage(scene, X, Y, WW, WH);
-    ctx.fillStyle = "rgba(250,244,228,0.36)"; ctx.fillRect(X, Y, WW, WH);
-    const HX = X + WW / 2, HY = Y + WH * 0.56;
-    const glow = ctx.createRadialGradient(HX, HY, 40, HX, HY, 470);
-    glow.addColorStop(0, "rgba(255,250,236,0.55)"); glow.addColorStop(1, "rgba(255,250,236,0)");
+    ctx.globalCompositeOperation = "screen"; ctx.fillStyle = "rgba(255,238,210,0.26)"; ctx.fillRect(X, Y, WW, WH);
+    ctx.globalCompositeOperation = "source-over";
+    const HX = X + WW / 2, HY = Y + WH * 0.58;
+    const glow = ctx.createRadialGradient(HX, HY, 40, HX, HY, 440);
+    glow.addColorStop(0, "rgba(255,250,236,0.42)"); glow.addColorStop(1, "rgba(255,250,236,0)");
     ctx.fillStyle = glow; ctx.fillRect(X, Y, WW, WH);
-    const dim = ctx.createRadialGradient(HX, HY, WH * 0.45, HX, HY, WH * 0.9);
-    dim.addColorStop(0, "rgba(60,40,15,0)"); dim.addColorStop(1, "rgba(60,40,15,0.22)");
-    ctx.fillStyle = dim; ctx.fillRect(X, Y, WW, WH);
     const ground = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-    ground.addColorStop(0, "rgba(25,15,5,0.38)"); ground.addColorStop(1, "rgba(25,15,5,0)");
+    ground.addColorStop(0, "rgba(25,15,5,0.36)"); ground.addColorStop(1, "rgba(25,15,5,0)");
     ctx.save(); ctx.translate(HX, Y + WH - 86); ctx.scale(280, 30); ctx.fillStyle = ground; ctx.beginPath(); ctx.arc(0, 0, 1, 0, 2 * Math.PI); ctx.fill(); ctx.restore();
-    // the hero stands above the name ribbon (its top edge is 70 px above the window's foot), below the crest
-    const hc = document.createElement("canvas"); hc.width = 900; hc.height = 570;
+    // the hero stands above the name ribbon (its top edge is 70 px above the window's foot), below the medallion
+    const hc = document.createElement("canvas"); hc.width = 900; hc.height = 560;
     await HeroArt.draw(hc, h, { part: "all", keepSize: true, dpr: 1, outline: 10 });
-    ctx.drawImage(hc, X + (WW - 900) / 2, Y + WH - 570 - 72);
+    ctx.drawImage(hc, X + (WW - 900) / 2, Y + WH - 560 - 72);
     ctx.restore();
 
-    // The crest, in the frame's own rings: the team line, then gold, as the arch's border runs into it.
-    ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.3)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
-    ctx.beginPath(); ctx.arc(CX, CY, CRING, 0, 2 * Math.PI); ctx.fillStyle = C.b; ctx.fill(); ctx.restore();
-    ctx.beginPath(); ctx.arc(CX, CY, CR + 6, 0, 2 * Math.PI); ctx.fillStyle = GOLD; ctx.fill();
-    ctx.save(); ctx.beginPath(); ctx.arc(CX, CY, CR, 0, 2 * Math.PI); ctx.clip(); ctx.drawImage(crest, CX - CR, CY - CR, 2 * CR, 2 * CR); ctx.restore();
-    for (const sx of [-1, 1]) star(ctx, CX + sx * (CRING + 40), Y - 2, 13, GOLD);   // two small gold stars beside it
+    // The medallion: the frame's bands wrapped all the way round the crest.
+    ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.35)"; ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
+    ctx.beginPath(); disc(R.halo); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
+    frameLines();
+    for (const [r, colour] of [[R.gold, GOLD], [R.gap, CARD], [R.team, C.b], [R.rim, GOLD]]) { ctx.beginPath(); disc(r); ctx.fillStyle = colour; ctx.fill(); }
+    ctx.save(); ctx.beginPath(); disc(CR); ctx.clip(); ctx.drawImage(crest, CX - CR, CY - CR, 2 * CR, 2 * CR); ctx.restore();
+    for (const sx of [-1, 1]) star(ctx, CX + sx * (R.mat + 34), Y - 12, 13, GOLD);   // a small gold star either side, on the gold line
 
     // The name, on a ribbon across the window's foot.
     const name = (h.name || "").trim();
