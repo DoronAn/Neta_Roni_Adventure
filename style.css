@@ -120,7 +120,7 @@ h2 em { font-style: normal; color: var(--orange); }
 /* ---- the legend: a poster ---- */
 .legend { text-align: center; position: relative; }
 .legend .scene { position: relative; height: 186px; margin: 4px 0 0; }
-.legend .scene .shield { position: absolute; z-index: 1; left: 50%; top: 0; width: 168px; height: 168px; transform: translateX(-50%); filter: drop-shadow(0 3px 2px rgba(80, 50, 10, 0.25)); }
+.legend .scene .shield { position: absolute; z-index: 1; left: 50%; top: 0; width: 178px; height: 178px; transform: translateX(-50%); filter: drop-shadow(0 3px 3px rgba(80, 50, 10, 0.3)); }
 .legend .scene .crest-stamp { position: absolute; bottom: 0; width: 118px; height: 118px; opacity: 0.95; mix-blend-mode: multiply; }
 .legend .scene .crest-stamp.neta { right: -10px; transform: rotate(9deg); }
 .legend .scene .crest-stamp.roni { left: -10px; transform: rotate(-11deg); }

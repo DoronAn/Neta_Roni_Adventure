@@ -19,6 +19,7 @@ need.add(PARTS.wings.src); need.add(PARTS.crests.neta); need.add(PARTS.crests.ro
 for (const k of Object.keys(CATALOG.abilities)) need.add(`ui/badge_${k}.webp`);
 for (const k of Object.keys(CATALOG.homelands)) need.add(`ui/home_${k}.webp`);
 for (const k of ["neta", "roni"]) need.add(`ui/stamp_${k}.webp`);
+need.add("ui/shield.webp");
 for (const f of need) if (!fs.existsSync(path.join(root, f))) miss.push("file " + f);
 if (miss.length) { console.error(miss.slice(0, 20).join("\n")); process.exit(1); }
 console.log(`ok: ${need.size} pictures, all present`);
