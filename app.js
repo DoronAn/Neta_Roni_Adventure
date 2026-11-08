@@ -56,6 +56,7 @@
   function paint() {
     // a sideways row keeps the chosen card in sight after the screen redraws
     app.querySelectorAll(".strip .card.on").forEach((c) => c.scrollIntoView({ block: "nearest", inline: "center" }));
+    arrows(); setTimeout(arrows, 400);
     requestAnimationFrame(() => {
       app.querySelectorAll("canvas[data-hero]").forEach((cv) => {
         const h = { ...hero, ...JSON.parse(cv.dataset.hero) };
@@ -66,6 +67,20 @@
   }
   const canvas = (h, part, cls = "", frame = "") =>
     `<canvas class="${cls}" data-hero='${esc(JSON.stringify(h))}' data-part="${part}" ${frame ? `data-frame="${frame}"` : ""}></canvas>`;
+  // A sideways row of choices, with arrows for the ones off screen (the row starts on the right, like Hebrew).
+  const strip = (cards) => `<div class="strip-wrap">
+      <button class="arrow right" data-act="slide" data-v="1" aria-label="הקודמים">›</button>
+      <div class="strip">${cards}</div>
+      <button class="arrow left" data-act="slide" data-v="-1" aria-label="עוד">‹</button></div>`;
+  function arrows() {
+    app.querySelectorAll(".strip-wrap").forEach((w) => {
+      const el = w.querySelector(".strip"), max = el.scrollWidth - el.clientWidth, pos = Math.abs(el.scrollLeft);
+      w.querySelector(".arrow.right").disabled = pos <= 2;
+      w.querySelector(".arrow.left").disabled = pos >= max - 2;
+      w.classList.toggle("fits", max <= 2);
+    });
+  }
+  app.addEventListener("scroll", arrows, true);
   const portrait = (small = false) => `<div class="stage${small ? " small" : ""}">${canvas({}, "all")}</div>`;
 
   // ---------- the screens ----------
@@ -92,27 +107,27 @@
           <div class="team-head"><img src="${PARTS.crests[k]}" alt=""><span class="ribbon">${TEAMS[k].he}</span></div>
           <div class="names">${KIDS.map((c, i) => (c.team === k ? `<button class="card ${hero.kid === i ? "on" : ""}" data-act="kid" data-v="${i}">${esc(c.name)}</button>` : "")).join("")}</div>
         </div>`;
-      return `${top()}${head("איך <em>קוראים</em> לך?")}${team("neta")}${team("roni")}`;
+      return `${top()}${head("איך <em>קוראים</em> לך?")}${team("neta")}${team("roni")}${bar("המשך", !!kid())}`;
     },
 
     gender() {
       const card = (v, label) => `<button class="card ${hero.gender === v ? "on" : ""}" data-act="gender" data-v="${v}">
           ${canvas({ species: "human", gender: v, hat: "none" }, "head", "sq", "fit")}<div class="name">${label}</div></button>`;
-      return `${top()}${head(`${esc(kid().name)}, מי יוצא <em>למסע</em>?`)}<div class="genders">${card("m", "גיבור")}${card("f", "גיבורה")}</div>`;
+      return `${top()}${head(`${esc(kid().name)}, מי יוצא <em>למסע</em>?`)}<div class="genders">${card("m", "גיבור")}${card("f", "גיבורה")}</div>${bar("המשך", !!hero.gender)}`;
     },
 
     species() {
       const cards = Object.keys(CATALOG.species).map((k) => `<button class="card ${hero.species === k ? "on" : ""}" data-act="species" data-v="${k}">
           ${canvas({ species: k, hat: "none" }, "head", "sq", "fit")}
           <div class="name">${speciesName(k)}</div><div class="desc">${CATALOG.species[k].desc_he[g()]}</div></button>`).join("");
-      return `${top()}${head(`${t("בחר", "בחרי")} את <em>העם</em> שלך`)}<div class="grid">${cards}</div>`;
+      return `${top()}${head(`${t("בחר", "בחרי")} את <em>העם</em> שלך`)}<div class="grid">${cards}</div>${bar("המשך", !!hero.species)}`;
     },
 
     cls() {
       const cards = Object.keys(CATALOG.classes).map((k) => `<button class="card ${hero.cls === k ? "on" : ""}" data-act="cls" data-v="${k}">
           ${canvas({ cls: k, colour: "original" }, "body", "tall", "fit")}
           <div class="name">${className(k)}</div><div class="desc">${CATALOG.classes[k].desc_he[g()]}</div></button>`).join("");
-      return `${top()}${head(`מה ${t("אתה יודע", "את יודעת")} <em>הכי טוב</em>?`)}<div class="grid three">${cards}</div>`;
+      return `${top()}${head(`מה ${t("אתה יודע", "את יודעת")} <em>הכי טוב</em>?`)}<div class="grid three">${cards}</div>${bar("המשך", !!hero.cls)}`;
     },
 
     colour() {
@@ -124,13 +139,13 @@
     hat() {
       const cards = Object.keys(CATALOG.headwear).map((k) => `<button class="card ${hero.hat === k ? "on" : ""}" data-act="hat" data-v="${k}">
           ${canvas({ hat: k }, "head", "sq", "fit")}<div class="name">${CATALOG.headwear[k]}</div></button>`).join("");
-      return `${top()}${portrait()}${head("מה על <em>הראש</em>?", false)}<div class="strip">${cards}</div>${bar("המשך")}`;
+      return `${top()}${portrait()}${head("מה על <em>הראש</em>?", false)}${strip(cards)}${bar("המשך")}`;
     },
 
     pet() {
       const cards = Object.keys(CATALOG.companions).map((k) => `<button class="card ${hero.pet === k ? "on" : ""}" data-act="pet" data-v="${k}">
           ${k === "none" ? `<div class="none-pet"></div>` : `<img src="${PARTS.pets[k].src}" alt="">`}<div class="name">${CATALOG.companions[k]}</div></button>`).join("");
-      return `${top()}${portrait()}${head("מי <em>מצטרף</em> אליך?", false)}<div class="strip">${cards}</div>${bar("המשך")}`;
+      return `${top()}${portrait()}${head("מי <em>מצטרף</em> אליך?", false)}${strip(cards)}${bar("המשך")}`;
     },
 
     strengths() {
@@ -139,7 +154,7 @@
         const a = CATALOG.abilities[k], on = hero.strengths.includes(k);
         return `<button class="card strength ${on ? "on" : ""}" data-act="strength" data-v="${k}">
           ${sug.includes(k) ? `<span class="tag">★ מתאים ל${className()}</span>` : ""}
-          <img class="badge" src="ui/badge_${k}.webp" alt=""><div class="name">${a.he}</div><div class="desc">${a.desc_he}</div></button>`;
+          <img class="badge" src="${badge(k)}" alt=""><div class="name">${a.he}</div><div class="desc">${a.desc_he}</div></button>`;
       }).join("");
       const n = hero.strengths.length;
       return `${top()}${head(`במה ${t("אתה", "את")} <em>${t("הכי חזק", "הכי חזקה")}</em>?`)}
@@ -172,10 +187,16 @@
     done() {
       let code = "";
       try { code = HeroCode.encode(hero); } catch (e) { console.warn(e); }
-      const seals = hero.strengths.map((k) => `<div class="seal"><img src="ui/badge_${k}.webp" alt="">${CATALOG.abilities[k].he}</div>`).join("");
-      return `<section class="done">${top()}${portrait()}
-        <div class="banner"><span>${esc(hero.name)}</span></div>
+      const home = CATALOG.homelands[hero.homeland];
+      const seals = hero.strengths.map((k) => `<div class="seal"><img src="${badge(k)}" alt="">${CATALOG.abilities[k].he}</div>`).join("");
+      return `<section class="done">${top()}
+        <div class="poster" style="background-image:url('ui/scene_${hero.homeland}.jpg')">
+          <img class="poster-crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">
+          ${canvas({}, "all")}
+          <div class="banner"><span style="font-size:${bannerSize(hero.name)}px">${esc(hero.name)}</span></div>
+        </div>
         <p class="what">${speciesName()} · ${className()}</p>
+        <p class="from">${t("בא", "באה")} מ${home.he} · ${TEAMS[kid().team].he}</p>
         <div class="seals">${seals}</div>
         <div class="scroll story">${esc(storyText())}</div>
         ${code ? `<span class="code">${code}</span>` : ""}
@@ -187,6 +208,10 @@
   };
 
   // The backstory: the kid's own words if they rewrote it, otherwise written from the choices (story.js).
+  // The name banner keeps a long name on one line by setting it smaller.
+  const bannerSize = (name) => { const n = [...name.trim()].length; return n <= 12 ? 40 : n <= 16 ? 34 : n <= 20 ? 29 : 25; };
+  // Strength badges: teal for Neta's team, orange for Roni's.
+  const badge = (k) => `ui/badge_${k}${kid() && kid().team === "roni" ? "_orange" : ""}.webp`;
   const storyText = () => hero.story || HeroStory.write(hero);
 
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -200,10 +225,11 @@
   const ACTS = {
     back,
     next,
-    kid: (v) => { set({ kid: +v }); teamClass(); next(); },
-    gender: (v) => { set({ gender: v }); next(); },
-    species: (v) => { set({ species: v }); next(); },
-    cls: (v) => { set({ cls: v }); next(); },
+    kid: (v) => { set({ kid: +v }); teamClass(); render(); },
+    gender: (v) => { set({ gender: v }); render(); },
+    species: (v) => { set({ species: v }); render(); },
+    cls: (v) => { set({ cls: v }); render(); },
+    slide: (v, b) => { const el = b.parentElement.querySelector(".strip"); el.scrollBy({ left: +v * el.clientWidth * 0.75, behavior: "smooth" }); },
     colour: (v) => { set({ colour: v }); render(); },
     hat: (v) => { set({ hat: v }); render(); },
     pet: (v) => { set({ pet: v }); render(); },
@@ -230,7 +256,7 @@
     const ta = document.getElementById("hero-story");
     if (ta && !["story-again", "homeland"].includes(b.dataset.act)) set({ story: ta.value.trim() === HeroStory.write(hero) ? "" : ta.value.trim() });
     if (b.dataset.act === "next" || b.dataset.act === "back") editing = false;
-    ACTS[b.dataset.act](b.dataset.v);
+    ACTS[b.dataset.act](b.dataset.v, b);
   });
   app.addEventListener("input", (e) => {
     if (e.target.id === "hero-story") { set({ story: e.target.value.trim() }); return; }
