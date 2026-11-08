@@ -211,6 +211,7 @@ h2 em { font-style: normal; color: var(--orange); }
 .homes .card { padding: 10px 4px 8px; }
 .homes .vignette { width: 100%; max-width: 92px; aspect-ratio: 1; filter: drop-shadow(0 2px 1px rgba(60, 40, 10, 0.25)); }
 .homes .card .name { font-size: 21px; }
+.story-head { font: 700 30px/1 "Karantina", sans-serif; color: var(--teal); text-align: center; margin: 18px 0 0; }
 .scroll {
   position: relative; margin: 16px 4px 10px; padding: 16px 18px 14px; background: var(--card);
   border: 2px solid var(--teal); border-radius: 6px; font-size: 16px; color: var(--ink);
@@ -235,3 +236,9 @@ h2 em { font-style: normal; color: var(--orange); }
 .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 calc(var(--frame) + 12px); }
 
 .err { background: #fde8e4; border: 2px solid var(--orange); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
+
+/* the backstory: read, or rewritten by the kid */
+.scroll.story { margin-top: 8px; line-height: 1.55; white-space: pre-wrap; text-align: right; }
+textarea.scroll.story { display: block; width: calc(100% - 8px); min-height: 260px; font: 700 16px/1.55 "Heebo", sans-serif; color: var(--ink); resize: vertical; }
+textarea.scroll.story:focus { outline: 2px solid var(--orange); outline-offset: 2px; }
+.done .scroll.story { margin: 6px 0 10px; font-size: 15px; }

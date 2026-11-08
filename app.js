@@ -1,5 +1,5 @@
 // The screens, in order, and what each one saves. The hero is kept on the phone as it's built (localStorage),
-// so closing the page and coming back carries on where the kid stopped. Steps 5-8 of the plan add the backstory,
+// so closing the page and coming back carries on where the kid stopped. The backstory is story.js; steps 6-8 of the plan add
 // the card, the print page and the reveal; the "done" screen here is where the card will go.
 
 (() => {
@@ -9,7 +9,8 @@
   const app = document.getElementById("app");
 
   // ---------- state ----------
-  const blank = () => ({ step: "legend", colour: "original", hat: "none", pet: "none", strengths: [], name: "" });
+  const blank = () => ({ step: "legend", colour: "original", hat: "none", pet: "none", strengths: [], name: "", story: "", storySeed: 0 });
+  let editing = false;          // the story is open for the kid to rewrite (not saved: a reload shows it closed)
   let hero = load();
   function load() {
     try { const h = JSON.parse(localStorage.getItem(STORE)); if (h && STEPS.includes(h.step)) return { ...blank(), ...h }; } catch (e) {}
@@ -159,8 +160,13 @@
       if (!hero.homeland) set({ homeland: pick(Object.keys(CATALOG.homelands)) });
       const cards = Object.keys(CATALOG.homelands).map((k) => `<button class="card ${hero.homeland === k ? "on" : ""}" data-act="homeland" data-v="${k}">
           <img class="vignette" src="ui/home_${k}.webp" alt=""><div class="name">${CATALOG.homelands[k].he}</div></button>`).join("");
+      const story = editing
+        ? `<textarea class="scroll story" id="hero-story" maxlength="700" dir="rtl">${esc(storyText())}</textarea>
+           <div class="row"><button class="btn ghost small" data-act="story-done">✓ זה הסיפור</button></div>`
+        : `<div class="scroll story">${esc(storyText())}</div>
+           <div class="row"><button class="btn ghost small" data-act="story-again">↻ סיפור אחר</button><button class="btn ghost small" data-act="story-edit">✎ לכתוב בעצמי</button></div>`;
       return `${top()}${head(`מאיפה ${t("אתה", "את")} <em>${t("בא", "באה")}</em>?`)}<div class="homes">${cards}</div>
-        <div class="scroll">${esc(draftStory())}</div>${bar("סיימתי!")}`;
+        <h3 class="story-head">הסיפור של ${esc(hero.name)}</h3>${story}${bar("סיימתי!")}`;
     },
 
     done() {
@@ -171,6 +177,7 @@
         <div class="banner"><span>${esc(hero.name)}</span></div>
         <p class="what">${speciesName()} · ${className()}</p>
         <div class="seals">${seals}</div>
+        <div class="scroll story">${esc(storyText())}</div>
         ${code ? `<span class="code">${code}</span>` : ""}
         <div class="stack">
           <button class="btn ghost small" data-act="edit">לשנות משהו</button>
@@ -179,11 +186,8 @@
     },
   };
 
-  // The backstory is plan step 5 (story.js); until then, one line from the homeland.
-  function draftStory() {
-    const h = CATALOG.homelands[hero.homeland];
-    return `${hero.name || t("הגיבור", "הגיבורה")} ${t("גדל", "גדלה")} ${h.in_he}. ${h.flavor[g()]}.`;
-  }
+  // The backstory: the kid's own words if they rewrote it, otherwise written from the choices (story.js).
+  const storyText = () => hero.story || HeroStory.write(hero);
 
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
   function suggestName() {
@@ -209,7 +213,10 @@
       set({ strengths: s }); render();
     },
     suggest: () => { set({ name: suggestName() }); render(); },
-    homeland: (v) => { set({ homeland: v }); render(); },
+    homeland: (v) => { set({ homeland: v, story: "" }); editing = false; render(); },
+    "story-again": () => { set({ storySeed: (hero.storySeed || 0) + 1, story: "" }); render(); },
+    "story-edit": () => { editing = true; render(); const ta = document.getElementById("hero-story"); if (ta) ta.focus(); },
+    "story-done": () => { editing = false; render(); },
     edit: () => go("species"),
     restart: () => {
       if (!confirm("להתחיל גיבור חדש? הגיבור הזה יימחק מהטלפון (תמונה שכבר נשמרה נשארת).")) return;
@@ -220,9 +227,13 @@
     const b = e.target.closest("[data-act]");
     if (!b || b.disabled) return;
     if (hero.step === "name") set({ name: (document.getElementById("hero-name") || {}).value || hero.name });
+    const ta = document.getElementById("hero-story");
+    if (ta && !["story-again", "homeland"].includes(b.dataset.act)) set({ story: ta.value.trim() === HeroStory.write(hero) ? "" : ta.value.trim() });
+    if (b.dataset.act === "next" || b.dataset.act === "back") editing = false;
     ACTS[b.dataset.act](b.dataset.v);
   });
   app.addEventListener("input", (e) => {
+    if (e.target.id === "hero-story") { set({ story: e.target.value.trim() }); return; }
     if (e.target.id !== "hero-name") return;
     set({ name: e.target.value });
     const btn = app.querySelector('.bar [data-act="next"]');
