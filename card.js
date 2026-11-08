@@ -85,10 +85,11 @@ const HeroCard = (() => {
     ctx.drawImage(hc, X + (WW - 900) / 2, Y + WH - 560 - 72);
     ctx.restore();
 
-    // The crest, filling the ring.
+    // The crest, set in the ring with a narrow cream gap between it and the gate's lines.
+    const CR = R - 11;
     ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.35)"; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
     ctx.beginPath(); disc(R - 2); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
-    ctx.save(); ctx.beginPath(); disc(R - 2); ctx.clip(); ctx.drawImage(crest, CX - R + 2, CY - R + 2, 2 * R - 4, 2 * R - 4); ctx.restore();
+    ctx.save(); ctx.beginPath(); disc(CR); ctx.clip(); ctx.drawImage(crest, CX - CR, CY - CR, 2 * CR, 2 * CR); ctx.restore();
     // The gold line: along the arch, then over the crest (the part of the ring outside the gold arch).
     ctx.save(); outside(() => disc(R)); ctx.beginPath(); goldArch(); ctx.lineWidth = 6; ctx.strokeStyle = GOLD; ctx.stroke(); ctx.restore();
     ctx.save(); outside(goldArch); ctx.beginPath(); disc(R); ctx.lineWidth = 6; ctx.strokeStyle = GOLD; ctx.stroke(); ctx.restore();
