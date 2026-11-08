@@ -83,8 +83,9 @@ const HeroStory = (() => {
     if (kid.leader) {
       const other = KIDS.find((k) => k.leader && k.team !== kid.team);
       s.push(`יום אחד ${say(HE)} ${say(FOUND)} מפה עתיקה, שמראה לאן התפזרו חלקי המגן השבור.`);
-      s.push(`${say(HE)} ${say(GATHERED)} חבורה של גיבורים אמיצים, ו${say(WENT)} בראשה לחפש אותם.`);
-      if (other) s.push(`באותו זמן, בצד השני של הממלכה, גם ${other.name} כבר בדרך, בראש חבורה משלה.`);
+      s.push(`${say(HE)} ${say(GATHERED)} חבורה של גיבורים אמיצים, והם יצאו יחדיו לחפש את השברים.`);
+      // about the other sister, so always feminine, whatever the hero's gender (Doron's wording, 2026-11-08)
+      if (other) s.push(`באותו זמן, בצד השני של הממלכה, גם ${other.name} יצאה לדרך, בראש חבורה משל עצמה.`);
     } else {
       s.push([`יום אחד הגיעה שמועה אל ${home.he}: חלקי המגן השבור מפוזרים בכל הממלכה, ונטע ורוני קוראות לגיבורים למצוא אותם.`,
               `בוקר אחד נחתה ${say(BESIDE)} יונה עם מכתב: נטע ורוני יוצאות למסע לאסוף את חלקי המגן השבור, וקוראות לגיבורים להצטרף אליהן.`,

@@ -17,9 +17,14 @@ const kids = [0, 1, KIDS.findIndex((k) => !k.leader && k.team === "neta"), KIDS.
 // Everything wrong with one story: any phrase from the other gender's side, no shield, or a hole in a template.
 function problems(text, gender) {
   const out = [], other = gender === "f" ? 0 : 1;
-  for (const p of pairs) if (p[0] !== p[1] && has(text, p[other])) out.push(`${gender} uses "${p[other]}": ${text}`);
+  // Neta's and Roni's stories end with a sentence about the other sister ("באותו זמן ... יצאה לדרך"), which is
+  // feminine whatever the hero's gender; it is checked on its own below and left out of the gender check.
+  const sister = (text.match(/באותו זמן, [^.]*\./) || [""])[0];
+  if (sister && !/יצאה לדרך, בראש חבורה משל עצמה\.$/.test(sister)) out.push(`the sister's sentence changed: ${sister}`);
+  const own = text.replace(sister, "");
+  for (const p of pairs) if (p[0] !== p[1] && has(own, p[other])) out.push(`${gender} uses "${p[other]}": ${text}`);
   if (!text.includes("המגן")) out.push(`no shield: ${text}`);
-  if (text.includes("שברי")) out.push(`"שברי" (Doron: the shield's pieces are "חלקי"): ${text}`);
+  if (text.includes("שברי המגן")) out.push(`"שברי המגן" (Doron: "חלקי המגן"): ${text}`);
   if (/undefined|null|\$\{/.test(text)) out.push(`template hole: ${text}`);
   return out;
 }
