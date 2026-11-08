@@ -29,9 +29,22 @@ const UI = (() => {
     return `<svg class="${cls}" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0 L10 5.6 L16 5.8 L11.3 9.4 L13 15 L8 11.7 L3 15 L4.7 9.4 L0 5.8 L6 5.6 Z"/></svg>`;
   }
 
+  // A twenty-sided die, seen face on: a hexagon with the faces drawn in, the number on the middle face.
+  function d20(cls = "") {
+    const T = [50, 4], UR = [90, 27], LR = [90, 73], B = [50, 96], LL = [10, 73], UL = [10, 27];
+    const A = [50, 26], C = [25, 67], D = [75, 67];          // the middle face
+    const line = (p, q) => `M${p[0]} ${p[1]}L${q[0]} ${q[1]}`;
+    const facets = [line(T, A), line(UL, A), line(UR, A), line(UL, C), line(UR, D), line(LL, C), line(LR, D), line(B, C), line(B, D)].join("");
+    return `<svg class="d20 ${cls}" viewBox="0 0 100 100" aria-hidden="true">
+      <polygon class="d20-body" points="${[T, UR, LR, B, LL, UL].map((p) => p.join(",")).join(" ")}"/>
+      <polygon class="d20-face" points="${[A, D, C].map((p) => p.join(",")).join(" ")}"/>
+      <path class="d20-lines" d="${facets}"/>
+      <text class="d20-num" x="50" y="60" text-anchor="middle">?</text></svg>`;
+  }
+
   // Hebrew numerals for the chapters: א׳ ב׳ ...
   const LETTERS = ["א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "יא", "יב"];
   const chapter = (i) => `פרק ${LETTERS[i]}׳`;
 
-  return { stamp, stars, star, chapter };
+  return { stamp, stars, star, chapter, d20 };
 })();

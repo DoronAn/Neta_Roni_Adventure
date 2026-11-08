@@ -4,13 +4,15 @@
 
 (() => {
   const STORE = "nra-hero-v1";
-  const STEPS = ["legend", "kid", "gender", "species", "cls", "colour", "hat", "pet", "strengths", "name", "homeland", "done"];
-  const DOTTED = STEPS.slice(1, -1);                   // the steps that show progress dots
+  const STEPS = ["legend", "kid", "gender", "species", "cls", "colour", "hat", "pet", "strengths", "name", "homeland", "reveal", "done"];
+  const DOTTED = STEPS.slice(1, -2);                   // the steps that show progress stars (not the reveal or the card)
+  const DIE = [14, 18];                                // every roll is a good one
   const app = document.getElementById("app");
 
   // ---------- state ----------
   const blank = () => ({ step: "legend", colour: "original", hat: "none", pet: "none", strengths: [], name: "", story: "", storySeed: 0 });
-  let editing = false;          // the story is open for the kid to rewrite (not saved: a reload shows it closed)
+  let editing = false;
+  let flyIn = false;            // the card flies in when it arrives from the dice          // the story is open for the kid to rewrite (not saved: a reload shows it closed)
   let hero = load();
   function load() {
     try { const h = JSON.parse(localStorage.getItem(STORE)); if (h && STEPS.includes(h.step)) return { ...blank(), ...h }; } catch (e) {}
@@ -29,19 +31,21 @@
 
   // ---------- navigation ----------
   function go(step, push = true) {
+    if (hero.step === "reveal" && step === "done") flyIn = true;   // however the kid leaves the dice, the card flies in
     set({ step });
     if (push) history.pushState({ step }, "");
     render();
     window.scrollTo(0, 0);
   }
   function back() {
+    if (hero.step === "done") return go("homeland");      // the dice were rolled; back from the card goes to the story
     const i = STEPS.indexOf(hero.step);
     if (i > 0) go(STEPS[i - 1]);
   }
   window.addEventListener("popstate", (e) => { if (e.state && e.state.step) { set({ step: e.state.step }); render(); } });
 
   function top() {
-    const i = hero.step === "done" ? DOTTED.length : DOTTED.indexOf(hero.step);
+    const i = ["reveal", "done"].includes(hero.step) ? DOTTED.length : DOTTED.indexOf(hero.step);
     const stars = DOTTED.map((st, j) => UI.star(j < i ? "on" : j === i ? "now" : "")).join("");
     const crest = kid() ? `<img class="crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">` : `<span class="crest none"></span>`;
     return `<div class="top"><button class="back" data-act="back" aria-label="חזרה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="progress">${stars}</div>${crest}</div>`;
@@ -184,6 +188,19 @@
         <h3 class="story-head">הסיפור של ${esc(hero.name)}</h3>${story}${bar("סיימתי!")}`;
     },
 
+    reveal() {
+      const dice = hero.strengths.map((k, i) => `<div class="die-slot">
+          <div class="die-wrap" id="die-${i}">${UI.d20()}</div>
+          <img class="badge" src="${badge(k)}" alt=""><div class="name">${CATALOG.abilities[k].he}</div></div>`).join("");
+      return `<section class="reveal">${top()}
+        <p class="kicker">רגע לפני שיוצאים לדרך</p>
+        <h2>${t("גלגל", "גלגלי")} את <em>הקוביות</em>!</h2>${UI.stars()}
+        <div class="stage small">${canvas({}, "all")}</div>
+        <div class="dice">${dice}</div>
+        <p class="result" id="dice-result">כל קובייה תגלה כמה ${t("אתה", "את")} ${t("חזק", "חזקה")} בכל כוח</p>
+        ${bar("🎲 גלגול!", true, "roll")}</section>`;
+    },
+
     done() {
       return `<section class="done">${top()}
         <p class="kicker">${t("הגיבור", "הגיבורה")} ${t("מוכן", "מוכנה")} למסע!</p>
@@ -209,23 +226,75 @@
     return `${kid().name} ${pick(CATALOG.epithets[pick(pool)][g()])}`;
   }
 
+  // ---------- the reveal: two dice, then the card flies in ----------
+  function rollDice(btn) {
+    Sound.unlock();
+    btn.disabled = true;
+    const values = hero.strengths.map(() => DIE[0] + Math.floor(Math.random() * (DIE[1] - DIE[0] + 1)));
+    const landAt = [1300, 1800];
+    Sound.rattle(1.7);
+    values.forEach((v, i) => {
+      const wrap = document.getElementById(`die-${i}`); if (!wrap) return;
+      const num = wrap.querySelector(".d20-num");
+      wrap.classList.remove("landed"); wrap.classList.add("rolling");
+      const spin = setInterval(() => { num.textContent = 1 + Math.floor(Math.random() * 20); }, 70);
+      setTimeout(() => {
+        clearInterval(spin); num.textContent = v;
+        wrap.classList.remove("rolling"); wrap.classList.add("landed"); Sound.land(i);
+      }, landAt[i]);
+    });
+    setTimeout(() => {
+      if (hero.step !== "reveal") return;
+      set({ dice: values });
+      const res = document.getElementById("dice-result");
+      if (res) res.innerHTML = hero.strengths.map((k, i) => `<b>${values[i]}</b> ב${CATALOG.abilities[k].he}`).join(" · ") + "!";
+      makeCard().catch(() => {});                          // draw the card while the kid reads the numbers
+      btn.textContent = "אל הכרטיס!"; btn.dataset.act = "next"; btn.disabled = false;
+      setTimeout(() => { if (hero.step === "reveal" && hero.dice) go("done"); }, 2200);
+    }, landAt[1] + 300);
+  }
+
   // ---------- the hero card ----------
   let card = { key: "", blob: null, url: "" };
   const cardKey = () => JSON.stringify([hero.kid, hero.gender, hero.species, hero.cls, hero.colour, hero.hat, hero.pet,
-    hero.strengths, hero.name, hero.homeland, hero.story, hero.storySeed]);
-  async function showCard() {
-    const img = document.getElementById("hero-card"); if (!img) return;
+    hero.strengths, hero.dice, hero.name, hero.homeland, hero.story, hero.storySeed]);
+  let drawing = null;
+  async function makeCard() {          // draws the card once per version of the hero
     const key = cardKey();
-    if (card.key !== key) {
+    if (card.key === key) return card;
+    if (drawing && drawing.key === key) return drawing.p;
+    const p = (async () => {
       const cv = document.createElement("canvas");
       await HeroCard.draw(cv, hero);
       const blob = await new Promise((res) => cv.toBlob(res, "image/jpeg", 0.92));
       if (card.url) URL.revokeObjectURL(card.url);
       card = { key, blob, url: URL.createObjectURL(blob) };
-    }
+      return card;
+    })();
+    drawing = { key, p };
+    return p;
+  }
+  async function showCard() {
+    if (!document.getElementById("hero-card")) return;
+    await makeCard();
     const now = document.getElementById("hero-card"); if (!now) return;      // the kid may have left the screen
-    now.src = card.url; now.closest(".card-frame").classList.add("ready");
+    now.src = card.url;
+    const frame = now.closest(".card-frame");
+    if (flyIn) { flyIn = false; arrive(frame); }
+    frame.classList.add("ready");
     const btn = app.querySelector('[data-act="share"]'); if (btn) btn.disabled = false;
+  }
+  // The card flies in, with a burst of light, gold sparks and the fanfare.
+  function arrive(frame) {
+    frame.classList.add("fly");
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement("i"), a = (i / 14) * 2 * Math.PI + Math.random() * 0.4, d = 140 + Math.random() * 120;
+      s.className = "spark"; s.style.setProperty("--dx", `${Math.cos(a) * d}px`); s.style.setProperty("--dy", `${Math.sin(a) * d}px`);
+      s.style.animationDelay = `${0.25 + Math.random() * 0.25}s`; frame.appendChild(s);
+    }
+    setTimeout(() => Sound.fanfare(), 250);
+    // once it has landed, the sparks and the glow go, so nothing is left past the screen's edge to scroll to
+    setTimeout(() => { frame.querySelectorAll(".spark").forEach((s) => s.remove()); frame.classList.remove("fly"); }, 1700);
   }
   const cardFile = () => {
     let code = "hero"; try { code = HeroCode.encode(hero); } catch (e) {}
@@ -259,7 +328,7 @@
     strength: (v) => {
       let s = hero.strengths.filter((x) => x !== v);
       if (s.length === hero.strengths.length) s = [...s, v].slice(-2);   // a third pick replaces the oldest
-      set({ strengths: s }); render();
+      set({ strengths: s, dice: null }); render();
     },
     suggest: () => { set({ name: suggestName() }); render(); },
     homeland: (v) => { set({ homeland: v, story: "" }); editing = false; render(); },
@@ -267,6 +336,7 @@
     "story-edit": () => { editing = true; render(); const ta = document.getElementById("hero-story"); if (ta) ta.focus(); },
     "story-done": () => { editing = false; render(); },
     share: shareCard,
+    roll: (v, b) => rollDice(b),
     edit: () => go("species"),
     restart: () => {
       if (!confirm("להתחיל גיבור חדש? הגיבור הזה יימחק מהטלפון (תמונה שכבר נשמרה נשארת).")) return;
@@ -301,10 +371,10 @@
   // ---------- drawing a screen ----------
   function ready(step) {      // a screen needs the choices before it; if one is missing, start from there
     const need = { gender: ["kid"], species: ["kid", "gender"], cls: ["species"], colour: ["cls"], hat: ["cls"], pet: ["cls"],
-                   strengths: ["cls"], name: ["cls"], homeland: ["name"], done: ["homeland", "strengths"] }[step] || [];
+                   strengths: ["cls"], name: ["cls"], homeland: ["name"], reveal: ["homeland", "strengths"], done: ["homeland", "strengths", "dice"] }[step] || [];
     for (const k of need) {
       const missing = k === "kid" ? !kid() : k === "strengths" ? hero.strengths.length !== 2 : k === "name" ? !hero.name.trim() : !hero[k];
-      if (missing) return k;              // each needed choice is made on the step of the same name
+      if (missing) return k === "dice" ? "reveal" : k;   // each needed choice is made on the step of the same name
     }
     return step;
   }

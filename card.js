@@ -131,6 +131,14 @@ const HeroCard = (() => {
       const bx = gx + gw / 2 - B;                                                          // badge on the right of its label
       ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.3)"; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
       ctx.drawImage(badges[i], bx, SY - B / 2, B, B); ctx.restore();
+      if (h.dice && h.dice[i]) {                       // the number the kid rolled, on a small die at the badge's foot
+        const dx = bx + B - 14, dy = SY + B / 2 - 14, r = 34;
+        ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.35)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2;
+        ctx.beginPath(); for (let j = 0; j < 6; j++) { const a = Math.PI / 2 + (j * Math.PI) / 3; ctx.lineTo(dx + r * Math.cos(a), dy - r * Math.sin(a)); }
+        ctx.closePath(); ctx.fillStyle = C.a; ctx.fill(); ctx.restore();
+        ctx.lineWidth = 4; ctx.strokeStyle = GOLD; ctx.stroke();
+        ctx.font = "700 42px Karantina"; ctx.fillStyle = CREAM; ctx.textAlign = "center"; ctx.fillText(String(h.dice[i]), dx, dy + 14);
+      }
       ctx.fillStyle = C.b; ctx.textAlign = "right"; ctx.fillText(label, bx - 18, SY + 21);
     });
     star(ctx, W / 2, SY, 20, C.a); star(ctx, W / 2 - 46, SY, 11, C.b); star(ctx, W / 2 + 46, SY, 11, C.b);

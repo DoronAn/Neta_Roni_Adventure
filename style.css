@@ -54,7 +54,7 @@ body {
 }
 
 #app {
-  max-width: 560px; margin: 0 auto;
+  max-width: 560px; margin: 0 auto; overflow-x: clip;     /* the reveal's sparks fly past the edges; no sideways scroll */
   min-height: 100vh; min-height: 100dvh;
   padding: calc(var(--frame) + 6px) calc(var(--frame) + 10px) 0;
   display: flex; flex-direction: column;
@@ -265,3 +265,65 @@ textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; 
 .card-frame.ready .card-wait { display: none; }
 .done .hint { margin: 8px 6px 0; }
 .costume { font: 700 30px/1.1 "Karantina", sans-serif; color: var(--a); margin: 14px 0 0; }
+
+/* ---- the reveal ---- */
+.reveal { text-align: center; display: flex; flex-direction: column; flex: 1; }
+.reveal .stage.small { flex: 1 1 140px; height: auto; min-height: 96px; max-height: 300px; }   /* fills the room the phone has */
+.reveal .divider { margin-bottom: 6px; }
+.dice { display: flex; justify-content: center; gap: 34px; margin: 6px 0 0; }
+.die-slot { display: flex; flex-direction: column; align-items: center; }
+.die-slot .badge { display: none; }
+.die-slot .name { font: 700 26px/1 "Karantina", sans-serif; color: var(--b); margin-top: 2px; }
+.die-wrap { width: 100px; height: 100px; }
+.d20 { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 5px rgba(50, 30, 10, 0.3)); }
+.d20-body { fill: var(--a); stroke: var(--gold); stroke-width: 3.5; stroke-linejoin: round; }
+.d20-face { fill: rgba(255, 255, 255, 0.12); }
+.d20-lines { fill: none; stroke: rgba(251, 241, 220, 0.55); stroke-width: 1.6; }
+.d20-num { fill: #fbf1dc; font: 700 30px Karantina, sans-serif; }
+.die-wrap.rolling { animation: tumble 0.42s linear infinite; }
+.die-wrap.landed { animation: land 0.5s cubic-bezier(.2, 1.6, .4, 1) both; }
+.die-wrap.landed .d20 { filter: drop-shadow(0 0 14px rgba(255, 214, 120, 0.95)) drop-shadow(0 6px 5px rgba(50, 30, 10, 0.3)); }
+.die-wrap.landed .d20-num { font-size: 34px; }
+@keyframes tumble {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  30% { transform: translateY(-26px) rotate(140deg) scale(0.92); }
+  60% { transform: translateY(-8px) rotate(250deg) scale(1.04); }
+  100% { transform: translateY(0) rotate(360deg) scale(1); }
+}
+@keyframes land { 0% { transform: scale(0.7) rotate(-20deg); } 100% { transform: scale(1) rotate(0); } }
+.result { font: 700 17px/1.3 "Heebo", sans-serif; color: var(--muted); margin: 8px 0 0; min-height: 2.6em; }
+.result b { font: 700 36px/1 "Karantina", sans-serif; color: var(--a); }
+
+/* the card flies in */
+.card-frame.fly { animation: fly-in 0.95s cubic-bezier(.2, 1.25, .4, 1) both; }
+.card-frame.fly img { opacity: 1; transition: none; }
+.card-frame.fly::before {
+  content: ""; position: absolute; inset: -25%; z-index: -1; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 231, 160, 0.95), rgba(255, 231, 160, 0) 60%);
+  animation: burst 1.4s ease-out both;
+}
+@keyframes fly-in {
+  0% { transform: translateY(80px) scale(0.25) rotate(-16deg); opacity: 0; }
+  55% { transform: translateY(-8px) scale(1.05) rotate(2deg); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes burst { 0% { opacity: 0; transform: scale(0.4); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.3); } }
+.spark {
+  position: absolute; left: 50%; top: 40%; width: 18px; height: 18px; margin: -9px; pointer-events: none; opacity: 0;
+  background: var(--gold); clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: spark 1s ease-out both;
+}
+@keyframes spark {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.4) rotate(0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.1) rotate(180deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .die-wrap.rolling, .die-wrap.landed, .card-frame.fly, .card-frame.fly::before, .spark { animation-duration: 0.01s; }
+}
+@media (max-height: 600px) {               /* very short screens: smaller dice and title, so the result shows */
+  .reveal .die-wrap { width: 84px; height: 84px; }
+  .reveal .kicker { display: none; }
+  .reveal .stage.small { min-height: 66px; }
+  .reveal h2 { font-size: 40px; }
+}
