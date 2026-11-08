@@ -39,4 +39,8 @@ for n in NAMES:
         w, hh = 2 * r * 0.648, 2 * r * 0.762
         scene = im.crop((int(cx - w / 2), int(cy - hh / 2), int(cx + w / 2), int(cy + hh / 2)))
         scene.resize((540, 636), Image.LANCZOS).save(os.path.join(OUT, n.replace("home_", "scene_") + ".jpg"), quality=86)
+        # and wide, for the hero card's window (1020 x 830): the widest rectangle of that shape inside the frame
+        w, hh = 2 * r * 0.7757, 2 * r * 0.6311
+        wide = im.crop((int(cx - w / 2), int(cy - hh / 2), int(cx + w / 2), int(cy + hh / 2)))
+        wide.resize((1020, 830), Image.LANCZOS).save(os.path.join(OUT, n.replace("home_", "scene_wide_") + ".jpg"), quality=86)
     print(name, "centre", round(cx), round(cy), "radius", round(r))
