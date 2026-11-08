@@ -16,6 +16,9 @@ for (const h of hats) for (const c of cls) for (const k of cols)
   for (const name of h === "flowers" ? ["flowers_back", "flowers_front"] : [h]) need.add(PARTS.hat_src.replace("{hat}", name).replace("{cls}", c).replace("{col}", k));
 for (const p of Object.keys(CATALOG.companions).filter((p) => p !== "none")) { if (!PARTS.pets[p]) miss.push("pet " + p); else need.add(PARTS.pets[p].src); }
 need.add(PARTS.wings.src); need.add(PARTS.crests.neta); need.add(PARTS.crests.roni);
+for (const k of Object.keys(CATALOG.abilities)) need.add(`ui/badge_${k}.webp`);
+for (const k of Object.keys(CATALOG.homelands)) need.add(`ui/home_${k}.webp`);
+for (const k of ["neta", "roni"]) need.add(`ui/stamp_${k}.webp`);
 for (const f of need) if (!fs.existsSync(path.join(root, f))) miss.push("file " + f);
 if (miss.length) { console.error(miss.slice(0, 20).join("\n")); process.exit(1); }
 console.log(`ok: ${need.size} pictures, all present`);

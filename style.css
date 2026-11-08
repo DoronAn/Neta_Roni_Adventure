@@ -187,8 +187,7 @@ h2 em { font-style: normal; color: var(--orange); }
 /* ---- strengths ---- */
 .count { text-align: center; color: var(--orange); margin: -6px 0 10px; }
 .strength { padding: 12px 6px 10px; }
-.strength .icon { width: 44px; height: 44px; color: var(--teal); }
-.strength.on .icon { color: var(--orange); }
+.strength .badge { width: 68px; height: 68px; filter: drop-shadow(0 2px 1px rgba(60, 40, 10, 0.25)); }
 .tag {
   position: absolute; top: -11px; right: 8px; white-space: nowrap;
   background: var(--gold); color: var(--teal); font-size: 12px; padding: 2px 9px 1px; border-radius: 10px;
@@ -210,8 +209,7 @@ h2 em { font-style: normal; color: var(--orange); }
 /* ---- homeland and story ---- */
 .homes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .homes .card { padding: 10px 4px 8px; }
-.homes .icon { width: 40px; height: 40px; color: var(--teal); }
-.homes .card.on .icon { color: var(--orange); }
+.homes .vignette { width: 100%; max-width: 92px; aspect-ratio: 1; filter: drop-shadow(0 2px 1px rgba(60, 40, 10, 0.25)); }
 .homes .card .name { font-size: 21px; }
 .scroll {
   position: relative; margin: 16px 4px 10px; padding: 16px 18px 14px; background: var(--card);
@@ -232,8 +230,7 @@ h2 em { font-style: normal; color: var(--orange); }
 .done .what { font: 700 30px/1 "Karantina", sans-serif; color: var(--teal); margin: 4px 0; }
 .seals { display: flex; justify-content: center; gap: 16px; margin: 4px 0 8px; }
 .seal { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--teal); font-size: 14px; }
-.seal i { width: 50px; height: 50px; border-radius: 50%; background: var(--teal); color: var(--gold); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--gold); }
-.seal i .icon { width: 30px; height: 30px; }
+.seal img { width: 62px; height: 62px; filter: drop-shadow(0 2px 1px rgba(60, 40, 10, 0.25)); }
 .code { display: inline-block; margin: 2px auto 0; font: 700 17px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 3px; direction: ltr; color: var(--teal); background: var(--card); border: 2px dashed var(--teal); border-radius: 8px; padding: 7px 12px 6px; }
 .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 calc(var(--frame) + 12px); }
 

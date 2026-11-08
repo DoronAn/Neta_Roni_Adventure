@@ -138,7 +138,7 @@
         const a = CATALOG.abilities[k], on = hero.strengths.includes(k);
         return `<button class="card strength ${on ? "on" : ""}" data-act="strength" data-v="${k}">
           ${sug.includes(k) ? `<span class="tag">★ מתאים ל${className()}</span>` : ""}
-          ${UI.icon(k)}<div class="name">${a.he}</div><div class="desc">${a.desc_he}</div></button>`;
+          <img class="badge" src="ui/badge_${k}.webp" alt=""><div class="name">${a.he}</div><div class="desc">${a.desc_he}</div></button>`;
       }).join("");
       const n = hero.strengths.length;
       return `${top()}${head(`במה ${t("אתה", "את")} <em>${t("הכי חזק", "הכי חזקה")}</em>?`)}
@@ -158,7 +158,7 @@
     homeland() {
       if (!hero.homeland) set({ homeland: pick(Object.keys(CATALOG.homelands)) });
       const cards = Object.keys(CATALOG.homelands).map((k) => `<button class="card ${hero.homeland === k ? "on" : ""}" data-act="homeland" data-v="${k}">
-          ${UI.icon(k)}<div class="name">${CATALOG.homelands[k].he}</div></button>`).join("");
+          <img class="vignette" src="ui/home_${k}.webp" alt=""><div class="name">${CATALOG.homelands[k].he}</div></button>`).join("");
       return `${top()}${head(`מאיפה ${t("אתה", "את")} <em>${t("בא", "באה")}</em>?`)}<div class="homes">${cards}</div>
         <div class="scroll">${esc(draftStory())}</div>${bar("סיימתי!")}`;
     },
@@ -166,7 +166,7 @@
     done() {
       let code = "";
       try { code = HeroCode.encode(hero); } catch (e) { console.warn(e); }
-      const seals = hero.strengths.map((k) => `<div class="seal"><i>${UI.icon(k)}</i>${CATALOG.abilities[k].he}</div>`).join("");
+      const seals = hero.strengths.map((k) => `<div class="seal"><img src="ui/badge_${k}.webp" alt="">${CATALOG.abilities[k].he}</div>`).join("");
       return `<section class="done">${top()}${portrait()}
         <div class="banner"><span>${esc(hero.name)}</span></div>
         <p class="what">${speciesName()} · ${className()}</p>
