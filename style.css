@@ -1,5 +1,5 @@
-/* An old adventure poster, after the party invitation: aged paper, a red and navy frame, condensed headlines
-   in navy and red, gold for the treasure. Big tap targets: some of the kids are six. */
+/* An old adventure poster, after the party invitation, in the two sisters' colours: Neta's teal and Roni's orange.
+   Aged paper, a two-colour frame, condensed headlines, gold for the treasure. Big tap targets: some of the kids are six. */
 
 @font-face { font-family: "Karantina"; font-weight: 700; src: url("fonts/Karantina_700Bold.ttf") format("truetype"); font-display: swap; }
 @font-face { font-family: "Heebo"; font-weight: 700; src: url("fonts/Heebo_700Bold.ttf") format("truetype"); font-display: swap; }
@@ -8,20 +8,17 @@
 :root {
   --paper: #f0e4c8;
   --card: #f8f0dd;
-  --navy: #1f3460;
-  --navy-2: #2d4a82;
-  --red: #c4262e;
-  --red-dark: #8f1a20;
+  --teal: #175e60;        /* Neta's team: the koala's teal, deepened for text */
+  --teal-2: #2b8a8b;
+  --orange: #dd6a14;      /* Roni's team: the rooster's orange */
+  --orange-dark: #9c470b;
   --gold: #d4a53a;
-  --ink: #1f2c4d;
-  --muted: #5a6482;
+  --ink: #183b3c;
+  --muted: #56706f;
   --line: #c9b58c;
-  --team: var(--red);
   --frame: 14px;
   color-scheme: light;
 }
-body.team-neta { --team: #17797a; }
-body.team-roni { --team: #d0641b; }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -36,13 +33,13 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* the poster's frame: red band, paper, navy line; the paper browns toward the edges */
+/* the poster's frame: an orange band, paper, a teal line; the paper browns toward the edges */
 .frame {
   position: fixed; inset: 0; pointer-events: none; z-index: 40;
   box-shadow:
-    inset 0 0 0 6px var(--red),
+    inset 0 0 0 6px var(--orange),
     inset 0 0 0 9px #f3e6c8,
-    inset 0 0 0 12px var(--navy),
+    inset 0 0 0 12px var(--teal),
     inset 0 0 70px 14px rgba(140, 95, 40, 0.30);
 }
 
@@ -57,37 +54,37 @@ body {
 .top { display: flex; align-items: center; gap: 8px; min-height: 44px; }
 .back {
   flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer;
-  background: var(--navy); color: #f3e6c8; font: 700 22px/1 "Heebo", sans-serif;
-  box-shadow: inset 0 0 0 2px var(--navy), inset 0 0 0 4px var(--gold), 0 2px 0 rgba(0, 0, 0, 0.25);
+  background: var(--teal); color: #f3e6c8; font: 700 22px/1 "Heebo", sans-serif;
+  box-shadow: inset 0 0 0 2px var(--teal), inset 0 0 0 4px var(--gold), 0 2px 0 rgba(0, 0, 0, 0.25);
 }
 .back:active { transform: translateY(1px); }
 .progress { flex: 1; display: flex; justify-content: center; gap: 4px; }
-.progress svg { width: 13px; height: 13px; fill: none; stroke: var(--navy); stroke-width: 1.4; opacity: 0.45; }
-.progress svg.on { fill: var(--red); stroke: var(--red); opacity: 1; }
-.progress svg.now { fill: var(--gold); stroke: var(--navy); opacity: 1; transform: scale(1.45); }
-.crest { flex: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 0 2px var(--navy); }
+.progress svg { width: 13px; height: 13px; fill: none; stroke: var(--teal); stroke-width: 1.4; opacity: 0.45; }
+.progress svg.on { fill: var(--orange); stroke: var(--orange); opacity: 1; }
+.progress svg.now { fill: var(--gold); stroke: var(--teal); opacity: 1; transform: scale(1.45); }
+.crest { flex: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 0 2px var(--teal); }
 .crest.none { visibility: hidden; }
 
 /* ---- headings ---- */
-.kicker { text-align: center; color: var(--red); font-size: 15px; letter-spacing: 0.5px; margin: 6px 0 0; }
+.kicker { text-align: center; color: var(--orange); font-size: 15px; letter-spacing: 0.5px; margin: 6px 0 0; }
 h2 {
-  font: 700 46px/0.95 "Karantina", "Secular One", sans-serif; color: var(--navy);
+  font: 700 46px/0.95 "Karantina", "Secular One", sans-serif; color: var(--teal);
   text-align: center; margin: 2px 0 6px;
 }
-h2 em { font-style: normal; color: var(--red); }
+h2 em { font-style: normal; color: var(--orange); }
 .divider { display: block; width: 190px; height: 16px; margin: 4px auto 12px; }
 
 /* ---- buttons ---- */
 .btn {
   display: block; width: 100%; border: 0; border-radius: 12px; cursor: pointer;
   font: 700 30px/1 "Karantina", "Heebo", sans-serif; letter-spacing: 0.5px;
-  padding: 14px 18px 12px; color: #fbf1dc; background: var(--red);
+  padding: 14px 18px 12px; color: #fbf1dc; background: var(--orange);
   outline: 2px dashed rgba(251, 241, 220, 0.75); outline-offset: -7px;
-  box-shadow: 0 4px 0 var(--red-dark), 0 6px 12px rgba(80, 30, 10, 0.25);
+  box-shadow: 0 4px 0 var(--orange-dark), 0 6px 12px rgba(80, 30, 10, 0.25);
 }
-.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--red-dark); }
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--orange-dark); }
 .btn:disabled { background: #b8ab94; outline-color: rgba(255, 255, 255, 0.5); box-shadow: 0 4px 0 #8f8471; cursor: default; }
-.btn.ghost { background: transparent; color: var(--navy); outline: 0; box-shadow: inset 0 0 0 2.5px var(--navy); font-size: 26px; }
+.btn.ghost { background: transparent; color: var(--teal); outline: 0; box-shadow: inset 0 0 0 2.5px var(--teal); font-size: 26px; }
 .btn.small { font-size: 22px; padding: 10px 14px 8px; }
 .bar {
   position: sticky; bottom: 0; z-index: 5; margin: auto calc(-1 * var(--frame) - 10px) 0;
@@ -101,34 +98,35 @@ h2 em { font-style: normal; color: var(--red); }
 .grid.three { grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .card {
   position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
-  background: var(--card); border: 2px solid var(--navy); border-radius: 12px;
+  background: var(--card); border: 2px solid var(--teal); border-radius: 12px;
   padding: 8px 6px 10px; cursor: pointer; color: var(--ink); font: inherit;
-  box-shadow: 3px 3px 0 rgba(31, 52, 96, 0.22);
+  box-shadow: 3px 3px 0 rgba(23, 94, 96, 0.22);
 }
-.card:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(31, 52, 96, 0.22); }
-.card.on { border: 3px solid var(--red); box-shadow: 3px 3px 0 var(--red-dark); background: #fbf3e2; }
+.card:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(23, 94, 96, 0.22); }
+.card.on { border: 3px solid var(--orange); box-shadow: 3px 3px 0 var(--orange-dark); background: #fbf3e2; }
 .card.on::after {          /* the chosen card gets a red stamp with a tick */
   content: ""; position: absolute; top: -10px; left: -10px; width: 34px; height: 34px; border-radius: 50%;
-  background: var(--red) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fbf1dc' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/22px no-repeat;
-  box-shadow: 0 0 0 2px #fbf1dc, 0 0 0 4px var(--red); transform: rotate(-12deg);
+  background: var(--orange) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fbf1dc' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/22px no-repeat;
+  box-shadow: 0 0 0 2px #fbf1dc, 0 0 0 4px var(--orange); transform: rotate(-12deg);
 }
 .card canvas, .card img { width: 100%; display: block; }
 .card canvas.sq { aspect-ratio: 1; }
 .card canvas.tall { aspect-ratio: 3 / 4; }
-.card .name { font: 700 27px/1 "Karantina", "Heebo", sans-serif; color: var(--navy); margin-top: 4px; }
+.card .name { font: 700 27px/1 "Karantina", "Heebo", sans-serif; color: var(--teal); margin-top: 4px; }
 .card .desc { font-size: 13px; color: var(--muted); line-height: 1.25; margin-top: 3px; }
 .three .card .name { font-size: 23px; }
 .three .card .desc { font-size: 11.5px; }
 
 /* ---- the legend: a poster ---- */
 .legend { text-align: center; position: relative; }
-.legend .scene { position: relative; height: 190px; margin: 4px 0 0; }
-.legend .scene .shield { position: absolute; left: 50%; top: 0; width: 180px; height: 180px; transform: translateX(-50%); }
-.legend .scene .castle { position: absolute; left: -6px; bottom: 6px; width: 110px; opacity: 0.9; }
-.legend .scene .dragon { position: absolute; right: -8px; top: 6px; width: 120px; }
-.legend .call { color: var(--red); font-size: 16px; margin: 4px 0 0; }
-.legend h1 { font: 700 80px/0.86 "Karantina", sans-serif; color: var(--navy); margin: 2px 0 2px; }
-.legend h1 em { font-style: normal; color: var(--red); }
+.legend .scene { position: relative; height: 186px; margin: 4px 0 0; }
+.legend .scene .shield { position: absolute; z-index: 1; left: 50%; top: 0; width: 168px; height: 168px; transform: translateX(-50%); filter: drop-shadow(0 3px 2px rgba(80, 50, 10, 0.25)); }
+.legend .scene .crest-stamp { position: absolute; bottom: 0; width: 118px; height: 118px; opacity: 0.95; mix-blend-mode: multiply; }
+.legend .scene .crest-stamp.neta { right: -10px; transform: rotate(9deg); }
+.legend .scene .crest-stamp.roni { left: -10px; transform: rotate(-11deg); }
+.legend .call { color: var(--orange); font-size: 16px; margin: 4px 0 0; }
+.legend h1 { font: 700 80px/0.86 "Karantina", sans-serif; color: var(--teal); margin: 2px 0 2px; }
+.legend h1 em { font-style: normal; color: var(--orange); }
 .legend p { margin: 0 0 10px; color: var(--ink); }
 .legend .stamp { float: left; width: 92px; height: 92px; margin: 0 2px 4px 8px; transform: rotate(-14deg); shape-outside: circle(50%); opacity: 0.92; }
 .legend .call.big { font-size: 19px; line-height: 1.3; margin: 6px 0 0; clear: both; }
@@ -138,16 +136,16 @@ h2 em { font-style: normal; color: var(--red); }
 /* ---- who are you ---- */
 .team { margin: 4px 0 16px; }
 .team-head { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 10px; }
-.team-head img { width: 54px; height: 54px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--navy), 0 0 0 5px var(--gold); }
+.team-head img { width: 54px; height: 54px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--teal), 0 0 0 5px var(--gold); }
 .ribbon {
   position: relative; display: inline-block; color: #fbf1dc; padding: 6px 22px 3px;
-  font: 700 28px/1 "Karantina", sans-serif; background: var(--tc, var(--red));
+  font: 700 28px/1 "Karantina", sans-serif; background: var(--tc, var(--orange));
   clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 50%, 100% 100%, 0 100%, 12px 50%);
 }
-.team.neta { --tc: #17797a; }
-.team.roni { --tc: #d0641b; }
+.team.neta { --tc: var(--teal-2); }
+.team.roni { --tc: var(--orange); }
 .names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.names .card { padding: 12px 6px 9px; font: 700 30px/1 "Karantina", sans-serif; color: var(--navy); border-color: var(--tc); }
+.names .card { padding: 12px 6px 9px; font: 700 30px/1 "Karantina", sans-serif; color: var(--teal); border-color: var(--tc); }
 
 .genders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
 .genders .card .name { font-size: 40px; }
@@ -155,13 +153,13 @@ h2 em { font-style: normal; color: var(--red); }
 /* ---- the hero's portrait (colour, headwear, companion, name) ---- */
 .stage {
   position: relative; flex: 1 1 auto; min-height: 210px; margin: 2px 6px 6px;
-  border: 3px solid var(--navy); border-radius: 48% 48% 14px 14px / 26% 26% 14px 14px;
+  border: 3px solid var(--teal); border-radius: 48% 48% 14px 14px / 26% 26% 14px 14px;
   background: radial-gradient(ellipse at 50% 60%, #fbf4e3 0%, #f3e7cb 60%, #e9d8b3 100%);
-  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--gold), 4px 6px 0 6px rgba(31, 52, 96, 0.12);
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--gold), 4px 6px 0 6px rgba(23, 94, 96, 0.12);
   display: flex; padding: 10px 8px 6px;
 }
 .stage::before {
-  content: ""; position: absolute; inset: 6px; border: 1.5px solid var(--red);
+  content: ""; position: absolute; inset: 6px; border: 1.5px solid var(--orange);
   border-radius: inherit; pointer-events: none; opacity: 0.6;
 }
 .stage canvas { position: absolute; top: 16px; bottom: 8px; left: 10px; right: 10px; width: calc(100% - 20px); height: calc(100% - 24px); }
@@ -182,29 +180,29 @@ h2 em { font-style: normal; color: var(--red); }
   position: relative; width: 50px; height: 50px; border-radius: 50%; display: block;
   box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.18), inset 0 -6px 10px rgba(0, 0, 0, 0.22), inset 0 5px 8px rgba(255, 255, 255, 0.35), 0 2px 0 rgba(0, 0, 0, 0.2);
 }
-.swatch.on b { box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.18), inset 0 -6px 10px rgba(0, 0, 0, 0.22), 0 0 0 3px var(--paper), 0 0 0 6px var(--red); }
+.swatch.on b { box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.18), inset 0 -6px 10px rgba(0, 0, 0, 0.22), 0 0 0 3px var(--paper), 0 0 0 6px var(--orange); }
 .swatch span { font-size: 13px; color: var(--muted); }
-.swatch.on span { color: var(--red); }
+.swatch.on span { color: var(--orange); }
 
 /* ---- strengths ---- */
-.count { text-align: center; color: var(--red); margin: -6px 0 10px; }
+.count { text-align: center; color: var(--orange); margin: -6px 0 10px; }
 .strength { padding: 12px 6px 10px; }
-.strength .icon { width: 44px; height: 44px; color: var(--navy); }
-.strength.on .icon { color: var(--red); }
+.strength .icon { width: 44px; height: 44px; color: var(--teal); }
+.strength.on .icon { color: var(--orange); }
 .tag {
   position: absolute; top: -11px; right: 8px; white-space: nowrap;
-  background: var(--gold); color: var(--navy); font-size: 12px; padding: 2px 9px 1px; border-radius: 10px;
+  background: var(--gold); color: var(--teal); font-size: 12px; padding: 2px 9px 1px; border-radius: 10px;
   box-shadow: 0 0 0 2px var(--card);
 }
 
 /* ---- name ---- */
 .field {
   width: 100%; font: 700 34px/1.1 "Karantina", "Heebo", sans-serif; padding: 12px 14px 8px; border-radius: 12px;
-  border: 2.5px solid var(--navy); background: var(--card); color: var(--navy); text-align: center;
-  box-shadow: inset 0 2px 6px rgba(31, 52, 96, 0.12);
+  border: 2.5px solid var(--teal); background: var(--card); color: var(--teal); text-align: center;
+  box-shadow: inset 0 2px 6px rgba(23, 94, 96, 0.12);
 }
 .field::placeholder { color: #a8a089; }
-.field:focus { outline: none; border-color: var(--red); }
+.field:focus { outline: none; border-color: var(--orange); }
 .row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
 .row .btn { width: auto; padding-inline: 22px; }
 .hint { text-align: center; color: var(--muted); font-size: 14px; margin: 8px 0 0; }
@@ -212,13 +210,13 @@ h2 em { font-style: normal; color: var(--red); }
 /* ---- homeland and story ---- */
 .homes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
 .homes .card { padding: 10px 4px 8px; }
-.homes .icon { width: 40px; height: 40px; color: var(--navy); }
-.homes .card.on .icon { color: var(--red); }
+.homes .icon { width: 40px; height: 40px; color: var(--teal); }
+.homes .card.on .icon { color: var(--orange); }
 .homes .card .name { font-size: 21px; }
 .scroll {
   position: relative; margin: 16px 4px 10px; padding: 16px 18px 14px; background: var(--card);
-  border: 2px solid var(--navy); border-radius: 6px; font-size: 16px; color: var(--ink);
-  box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5.5px var(--gold), 3px 3px 0 rgba(31, 52, 96, 0.2);
+  border: 2px solid var(--teal); border-radius: 6px; font-size: 16px; color: var(--ink);
+  box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5.5px var(--gold), 3px 3px 0 rgba(23, 94, 96, 0.2);
 }
 
 /* ---- the finished hero ---- */
@@ -226,17 +224,17 @@ h2 em { font-style: normal; color: var(--red); }
 .done .stage { min-height: 300px; }
 .banner { position: relative; z-index: 2; margin: -26px auto 6px; max-width: 92%; }
 .banner span {
-  display: inline-block; color: #fbf1dc; background: var(--red); padding: 10px 30px 5px;
+  display: inline-block; color: #fbf1dc; background: var(--orange); padding: 10px 30px 5px;
   font: 700 40px/1 "Karantina", sans-serif; letter-spacing: 0.5px;
   clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 50%, 100% 100%, 0 100%, 16px 50%);
-  box-shadow: inset 0 0 0 2px var(--red-dark);
+  box-shadow: inset 0 0 0 2px var(--orange-dark);
 }
-.done .what { font: 700 30px/1 "Karantina", sans-serif; color: var(--navy); margin: 4px 0; }
+.done .what { font: 700 30px/1 "Karantina", sans-serif; color: var(--teal); margin: 4px 0; }
 .seals { display: flex; justify-content: center; gap: 16px; margin: 4px 0 8px; }
-.seal { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--navy); font-size: 14px; }
-.seal i { width: 50px; height: 50px; border-radius: 50%; background: var(--navy); color: var(--gold); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--gold); }
+.seal { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--teal); font-size: 14px; }
+.seal i { width: 50px; height: 50px; border-radius: 50%; background: var(--teal); color: var(--gold); display: grid; place-items: center; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--gold); }
 .seal i .icon { width: 30px; height: 30px; }
-.code { display: inline-block; margin: 2px auto 0; font: 700 17px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 3px; direction: ltr; color: var(--navy); background: var(--card); border: 2px dashed var(--navy); border-radius: 8px; padding: 7px 12px 6px; }
+.code { display: inline-block; margin: 2px auto 0; font: 700 17px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 3px; direction: ltr; color: var(--teal); background: var(--card); border: 2px dashed var(--teal); border-radius: 8px; padding: 7px 12px 6px; }
 .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 calc(var(--frame) + 12px); }
 
-.err { background: #fde8e4; border: 2px solid var(--red); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }
+.err { background: #fde8e4; border: 2px solid var(--orange); border-radius: 12px; padding: 12px; margin: 10px 0; text-align: center; }

@@ -72,7 +72,7 @@
     legend() {
       return `<section class="legend">
         <p class="call">הרפתקנים מכל קצוות הממלכה</p>
-        <div class="scene">${UI.castle("castle")}${UI.shield("shield")}${UI.HAS.dragon ? `<img class="dragon" src="ui/dragon.webp" alt="">` : ""}</div>
+        <div class="scene"><img class="crest-stamp neta" src="ui/stamp_neta.webp" alt="">${UI.shield("shield")}<img class="crest-stamp roni" src="ui/stamp_roni.webp" alt=""></div>
         <h1>המגן <em>השבור</em></h1>
         ${UI.stars()}
         <div class="text">
