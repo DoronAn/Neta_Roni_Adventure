@@ -185,21 +185,12 @@
     },
 
     done() {
-      let code = "";
-      try { code = HeroCode.encode(hero); } catch (e) { console.warn(e); }
-      const home = CATALOG.homelands[hero.homeland];
-      const seals = hero.strengths.map((k) => `<div class="seal"><img src="${badge(k)}" alt="">${CATALOG.abilities[k].he}</div>`).join("");
       return `<section class="done">${top()}
-        <div class="poster" style="background-image:url('ui/scene_${hero.homeland}.jpg')">
-          <img class="poster-crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">
-          ${canvas({}, "all", "", "", 4)}
-          <div class="banner"><span style="font-size:${bannerSize(hero.name)}px">${esc(hero.name)}</span></div>
-        </div>
-        <p class="what">${speciesName()} · ${className()}</p>
-        <p class="from">${t("בא", "באה")} מ${home.he} · ${TEAMS[kid().team].he}</p>
-        <div class="seals">${seals}</div>
-        <div class="scroll story">${esc(storyText())}</div>
-        ${code ? `<span class="code">${code}</span>` : ""}
+        <p class="kicker">${t("הגיבור", "הגיבורה")} ${t("מוכן", "מוכנה")} למסע!</p>
+        <div class="card-frame"><img id="hero-card" alt="${t("כרטיס הגיבור", "כרטיס הגיבורה")} ${esc(hero.name)}"><p class="card-wait">${t("מכינים את כרטיס הגיבור…", "מכינים את כרטיס הגיבורה…")}</p></div>
+        <button class="btn" data-act="share" disabled>שמירה ושליחה</button>
+        <p class="hint">שמרו את הכרטיס ושלחו אותו אלינו בווטסאפ. בטלפון אפשר גם ללחוץ לחיצה ארוכה על הכרטיס כדי לשמור אותו.</p>
+        <p class="costume">בואו מחופשים ${t("לגיבור", "לגיבורה")} שיצרתם!</p>
         <div class="stack">
           <button class="btn ghost small" data-act="edit">לשנות משהו</button>
           <button class="btn ghost small" data-act="restart">להתחיל מחדש</button>
@@ -208,8 +199,6 @@
   };
 
   // The backstory: the kid's own words if they rewrote it, otherwise written from the choices (story.js).
-  // The name banner keeps a long name on one line by setting it smaller.
-  const bannerSize = (name) => { const n = [...name.trim()].length; return n <= 12 ? 40 : n <= 16 ? 34 : n <= 20 ? 29 : 25; };
   // Strength badges: teal for Neta's team, orange for Roni's.
   const badge = (k) => `ui/badge_${k}${kid() && kid().team === "roni" ? "_orange" : ""}.webp`;
   const storyText = () => hero.story || HeroStory.write(hero);
@@ -218,6 +207,40 @@
   function suggestName() {
     const pool = hero.strengths.length ? hero.strengths : Object.keys(CATALOG.abilities);
     return `${kid().name} ${pick(CATALOG.epithets[pick(pool)][g()])}`;
+  }
+
+  // ---------- the hero card ----------
+  let card = { key: "", blob: null, url: "" };
+  const cardKey = () => JSON.stringify([hero.kid, hero.gender, hero.species, hero.cls, hero.colour, hero.hat, hero.pet,
+    hero.strengths, hero.name, hero.homeland, hero.story, hero.storySeed]);
+  async function showCard() {
+    const img = document.getElementById("hero-card"); if (!img) return;
+    const key = cardKey();
+    if (card.key !== key) {
+      const cv = document.createElement("canvas");
+      await HeroCard.draw(cv, hero);
+      const blob = await new Promise((res) => cv.toBlob(res, "image/jpeg", 0.92));
+      if (card.url) URL.revokeObjectURL(card.url);
+      card = { key, blob, url: URL.createObjectURL(blob) };
+    }
+    const now = document.getElementById("hero-card"); if (!now) return;      // the kid may have left the screen
+    now.src = card.url; now.closest(".card-frame").classList.add("ready");
+    const btn = app.querySelector('[data-act="share"]'); if (btn) btn.disabled = false;
+  }
+  const cardFile = () => {
+    let code = "hero"; try { code = HeroCode.encode(hero); } catch (e) {}
+    return new File([card.blob], `hero-${code}.jpg`, { type: "image/jpeg" });
+  };
+  // Share sheet where the phone can share a picture (WhatsApp, Photos); otherwise the picture downloads.
+  async function shareCard() {
+    if (!card.blob) return;
+    const file = cardFile();
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: hero.name }); return; }
+      catch (e) { if (e.name === "AbortError") return; }       // the kid closed the share sheet
+    }
+    const a = document.createElement("a"); a.href = card.url; a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
   }
 
   // ---------- what a tap does ----------
@@ -243,6 +266,7 @@
     "story-again": () => { set({ storySeed: (hero.storySeed || 0) + 1, story: "" }); render(); },
     "story-edit": () => { editing = true; render(); const ta = document.getElementById("hero-story"); if (ta) ta.focus(); },
     "story-done": () => { editing = false; render(); },
+    share: shareCard,
     edit: () => go("species"),
     restart: () => {
       if (!confirm("להתחיל גיבור חדש? הגיבור הזה יימחק מהטלפון (תמונה שכבר נשמרה נשארת).")) return;
@@ -289,9 +313,11 @@
     if (step !== hero.step) set({ step });
     app.innerHTML = SCREENS[step]();
     paint();
+    if (step === "done") showCard().catch((e) => { console.warn(e); const w = app.querySelector(".card-wait"); if (w) w.textContent = "משהו השתבש. נסו לרענן את הדף."; });
     prefetch(step);
   }
   function prefetch(step) {      // the next screen's pictures, while the kid is still looking at this one
+    if (step === "homeland" && kid()) [`ui/scene_wide_${hero.homeland}.jpg`, PARTS.crests[kid().team], ...hero.strengths.map(badge)].forEach((s) => HeroArt.load(s).catch(() => {}));
     if (step === "gender" || step === "species") Object.keys(CATALOG.species).forEach((s) => ["m", "f"].forEach((gg) => HeroArt.preload({ species: s, gender: gg, hat: "none" }, "head")));
     if (step === "species" && hero.species) Object.keys(CATALOG.classes).forEach((c) => HeroArt.preload({ ...hero, cls: c, colour: "original" }, "body"));
     if (step === "cls" && hero.cls) Object.keys(CATALOG.outfit_colors).forEach((c) => HeroArt.preload({ ...hero, colour: c }));

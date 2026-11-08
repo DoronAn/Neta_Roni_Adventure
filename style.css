@@ -232,17 +232,6 @@ h2 em { font-style: normal; color: var(--a); }
 
 /* ---- the finished hero ---- */
 .done { text-align: center; display: flex; flex-direction: column; flex: 1; }
-.banner { position: relative; z-index: 2; margin: -26px auto 6px; max-width: 92%; }
-.banner span {
-  display: inline-block; color: #fbf1dc; background: var(--a); padding: 10px 30px 5px;
-  font: 700 40px/1 "Karantina", sans-serif; letter-spacing: 0.5px;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 16px) 50%, 100% 100%, 0 100%, 16px 50%);
-  box-shadow: inset 0 0 0 2px var(--a-dark);
-}
-.done .what { font: 700 30px/1 "Karantina", sans-serif; color: var(--b); margin: 4px 0; }
-.seals { display: flex; justify-content: center; gap: 16px; margin: 4px 0 8px; }
-.seal { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--b); font-size: 14px; }
-.seal img { width: 62px; height: 62px; filter: drop-shadow(0 2px 1px rgba(60, 40, 10, 0.25)); }
 .code { display: inline-block; margin: 2px auto 0; font: 700 17px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 3px; direction: ltr; color: var(--b); background: var(--card); border: 2px dashed var(--b); border-radius: 8px; padding: 7px 12px 6px; }
 .stack { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 calc(var(--frame) + 12px); }
 
@@ -252,7 +241,6 @@ h2 em { font-style: normal; color: var(--a); }
 .scroll.story { margin-top: 8px; line-height: 1.55; white-space: pre-wrap; text-align: right; }
 textarea.scroll.story { display: block; width: calc(100% - 8px); min-height: 260px; font: 700 16px/1.55 "Heebo", sans-serif; color: var(--ink); resize: vertical; }
 textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; }
-.done .scroll.story { margin: 6px 0 10px; font-size: 15px; }
 
 /* sideways rows: arrows over the edges */
 .strip-wrap { position: relative; }
@@ -266,27 +254,14 @@ textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; 
 .strip-wrap.fits .arrow { display: none; }
 .arrow:active { transform: scale(0.94); }
 
-/* the finished hero: a poster, the hero on the homeland's scene */
-.poster {
-  position: relative; margin: 8px 6px 34px; aspect-ratio: 5 / 6; background: #d8c9a6 center / cover no-repeat;
-  border: 3px solid var(--b); border-radius: 48% 48% 14px 14px / 30% 30% 14px 14px;
-  box-shadow: 0 0 0 3px var(--paper), 0 0 0 6px var(--gold), 5px 8px 0 7px rgba(var(--b-rgb), 0.14);
-}
-.poster::before {          /* the scene darkens toward the edges, so the hero stands out */
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  box-shadow: inset 0 0 50px 12px rgba(40, 25, 10, 0.38), inset 0 -60px 60px -30px rgba(40, 25, 10, 0.25);
-}
-.poster::after {           /* a shadow on the ground under the hero's feet */
-  content: ""; position: absolute; left: 20%; right: 20%; bottom: 6%; height: 7%; pointer-events: none;
-  background: radial-gradient(ellipse at center, rgba(25, 15, 5, 0.45), rgba(25, 15, 5, 0) 70%);
-}
-.poster canvas { position: absolute; z-index: 1; left: 4%; top: 7%; width: 92%; height: 84%; }
-.poster-crest {
-  position: absolute; z-index: 2; top: -30px; left: -14px; width: 96px; height: 96px; border-radius: 50%; transform: rotate(-8deg);
-  box-shadow: 0 0 0 2.5px var(--b), 0 0 0 5px var(--gold), 0 4px 8px 4px rgba(40, 25, 10, 0.3);
-}
-.poster .banner { position: absolute; z-index: 2; left: -8px; right: -8px; bottom: -28px; margin: 0 auto; text-align: center; }
-.poster .banner span { white-space: nowrap; }
-.done .from { margin: 0 0 6px; color: var(--muted); font-size: 15px; }
-.done .top .crest { visibility: hidden; }   /* on the poster instead */
 .arrow svg { width: 22px; height: 22px; }
+
+/* the finished hero: the card itself, then save and share */
+.done .top .crest { visibility: hidden; }       /* the card carries it */
+.card-frame { position: relative; margin: 4px 0 14px; aspect-ratio: 2 / 3; border-radius: 6px; background: rgba(var(--b-rgb), 0.08); box-shadow: 0 8px 22px rgba(60, 40, 10, 0.3); }
+.card-frame img { display: block; width: 100%; height: 100%; border-radius: 6px; opacity: 0; transition: opacity 0.5s; -webkit-touch-callout: default; }
+.card-frame.ready img { opacity: 1; }
+.card-wait { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: var(--muted); }
+.card-frame.ready .card-wait { display: none; }
+.done .hint { margin: 8px 6px 0; }
+.costume { font: 700 30px/1.1 "Karantina", sans-serif; color: var(--a); margin: 14px 0 0; }
