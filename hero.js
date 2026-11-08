@@ -59,7 +59,8 @@ const HeroArt = (() => {
 
 
   // Draws hero h on a canvas, fitted inside it and standing on its bottom edge.
-  // opts.part as in layers(); opts.frame: [x0, y0, x1, y1] in hero space, or "fit" to frame the layers tightly.
+  // opts.part as in layers(); opts.frame: [x0, y0, x1, y1] in hero space, or "fit" to frame the layers tightly;
+  // opts.outline: a white sticker edge this many CSS pixels wide, with a soft shadow (for a hero on a picture).
   async function draw(canvas, h, opts = {}) {
     const part = opts.part || "all";
     const ls = layers(h, part);
@@ -85,9 +86,13 @@ const HeroArt = (() => {
     const fw = frame[2] - frame[0], fh = frame[3] - frame[1];
     const k = Math.min(W / fw, H / fh);
     const ox = (W - fw * k) / 2 - frame[0] * k, oy = H - fh * k - frame[1] * k;
-    const ctx = canvas.getContext("2d");
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, W, H);
+    const out = canvas.getContext("2d");
+    out.setTransform(1, 0, 0, 1, 0, 0);
+    out.clearRect(0, 0, W, H);
+    // With an outline, the layers are drawn on a scratch canvas first, then laid on a white silhouette of themselves.
+    const target = opts.outline ? document.createElement("canvas") : canvas;
+    if (opts.outline) { target.width = W; target.height = H; }
+    const ctx = target.getContext("2d");
     ctx.imageSmoothingQuality = "high";
     ims.forEach((im, i) => {
       const m = ls[i].m;
@@ -96,6 +101,20 @@ const HeroArt = (() => {
       ctx.drawImage(im, 0, 0);
     });
     ctx.setTransform(1, 0, 0, 1, 0, 0);
+    if (opts.outline) {
+      // A sticker's white edge: the hero's shape stamped in a ring of directions, filled white; then a soft shadow.
+      const r = opts.outline * dpr, sil = document.createElement("canvas"); sil.width = W; sil.height = H;
+      const s = sil.getContext("2d");
+      for (const rr of [r, r * 0.55]) for (let i = 0; i < 20; i++) {
+        const a = (i / 20) * Math.PI * 2; s.drawImage(target, Math.cos(a) * rr, Math.sin(a) * rr);
+      }
+      s.globalCompositeOperation = "source-in"; s.fillStyle = "#fffdf6"; s.fillRect(0, 0, W, H);
+      out.save();
+      out.shadowColor = "rgba(30, 20, 8, 0.45)"; out.shadowBlur = 9 * dpr; out.shadowOffsetY = 4 * dpr;
+      out.drawImage(sil, 0, 0);
+      out.restore();
+      out.drawImage(target, 0, 0);
+    }
   }
 
   // Fetches the pictures a hero needs ahead of time, so the next screen draws at once.

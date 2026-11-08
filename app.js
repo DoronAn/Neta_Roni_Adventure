@@ -44,7 +44,7 @@
     const i = hero.step === "done" ? DOTTED.length : DOTTED.indexOf(hero.step);
     const stars = DOTTED.map((st, j) => UI.star(j < i ? "on" : j === i ? "now" : "")).join("");
     const crest = kid() ? `<img class="crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">` : `<span class="crest none"></span>`;
-    return `<div class="top"><button class="back" data-act="back" aria-label="חזרה">→</button><div class="progress">${stars}</div>${crest}</div>`;
+    return `<div class="top"><button class="back" data-act="back" aria-label="חזרה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="progress">${stars}</div>${crest}</div>`;
   }
   // A chapter heading: "פרק ג׳", the title (a word in <em> turns red), and a star divider unless it's tight.
   const head = (title, divider = true) =>
@@ -60,18 +60,18 @@
     requestAnimationFrame(() => {
       app.querySelectorAll("canvas[data-hero]").forEach((cv) => {
         const h = { ...hero, ...JSON.parse(cv.dataset.hero) };
-        HeroArt.draw(cv, h, { part: cv.dataset.part || "all", frame: cv.dataset.frame === "fit" ? "fit" : undefined })
+        HeroArt.draw(cv, h, { part: cv.dataset.part || "all", frame: cv.dataset.frame === "fit" ? "fit" : undefined, outline: +cv.dataset.outline || 0 })
           .catch((e) => console.warn(e));
       });
     });
   }
-  const canvas = (h, part, cls = "", frame = "") =>
-    `<canvas class="${cls}" data-hero='${esc(JSON.stringify(h))}' data-part="${part}" ${frame ? `data-frame="${frame}"` : ""}></canvas>`;
+  const canvas = (h, part, cls = "", frame = "", outline = 0) =>
+    `<canvas class="${cls}" data-hero='${esc(JSON.stringify(h))}' data-part="${part}" ${frame ? `data-frame="${frame}"` : ""} ${outline ? `data-outline="${outline}"` : ""}></canvas>`;
   // A sideways row of choices, with arrows for the ones off screen (the row starts on the right, like Hebrew).
   const strip = (cards) => `<div class="strip-wrap">
-      <button class="arrow right" data-act="slide" data-v="1" aria-label="הקודמים">›</button>
+      <button class="arrow right" data-act="slide" data-v="1" aria-label="הקודמים"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 6 15.5 12l-6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="strip">${cards}</div>
-      <button class="arrow left" data-act="slide" data-v="-1" aria-label="עוד">‹</button></div>`;
+      <button class="arrow left" data-act="slide" data-v="-1" aria-label="עוד"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
   function arrows() {
     app.querySelectorAll(".strip-wrap").forEach((w) => {
       const el = w.querySelector(".strip"), max = el.scrollWidth - el.clientWidth, pos = Math.abs(el.scrollLeft);
@@ -192,7 +192,7 @@
       return `<section class="done">${top()}
         <div class="poster" style="background-image:url('ui/scene_${hero.homeland}.jpg')">
           <img class="poster-crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">
-          ${canvas({}, "all")}
+          ${canvas({}, "all", "", "", 4)}
           <div class="banner"><span style="font-size:${bannerSize(hero.name)}px">${esc(hero.name)}</span></div>
         </div>
         <p class="what">${speciesName()} · ${className()}</p>

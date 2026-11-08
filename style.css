@@ -67,6 +67,8 @@ body {
   background: var(--b); color: #f3e6c8; font: 700 22px/1 "Heebo", sans-serif;
   box-shadow: inset 0 0 0 2px var(--b), inset 0 0 0 4px var(--gold), 0 2px 0 rgba(0, 0, 0, 0.25);
 }
+.back { display: grid; place-items: center; padding: 0; }
+.back svg { width: 22px; height: 22px; }
 .back:active { transform: translateY(1px); }
 .progress { flex: 1; display: flex; justify-content: center; gap: 4px; }
 .progress svg { width: 13px; height: 13px; fill: none; stroke: var(--b); stroke-width: 1.4; opacity: 0.45; }
@@ -256,7 +258,7 @@ textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; 
 .strip-wrap { position: relative; }
 .arrow {
   position: absolute; top: 50%; z-index: 3; width: 38px; height: 38px; margin-top: -19px; border-radius: 50%; border: 0;
-  background: var(--a); color: #fbf1dc; font: 700 28px/1 "Heebo", sans-serif; cursor: pointer; padding: 0 0 4px;
+  background: var(--a); color: #fbf1dc; cursor: pointer; padding: 0; display: grid; place-items: center;
   box-shadow: 0 0 0 2px #fbf1dc, 0 0 0 4px var(--a), 0 3px 6px rgba(0, 0, 0, 0.25);
 }
 .arrow.right { right: -14px; } .arrow.left { left: -14px; }
@@ -278,12 +280,13 @@ textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; 
   content: ""; position: absolute; left: 20%; right: 20%; bottom: 6%; height: 7%; pointer-events: none;
   background: radial-gradient(ellipse at center, rgba(25, 15, 5, 0.45), rgba(25, 15, 5, 0) 70%);
 }
-.poster canvas { position: absolute; z-index: 1; left: 4%; top: 7%; width: 92%; height: 84%; filter: drop-shadow(0 0 6px rgba(255, 245, 220, 0.55)); }
+.poster canvas { position: absolute; z-index: 1; left: 4%; top: 7%; width: 92%; height: 84%; }
 .poster-crest {
-  position: absolute; z-index: 2; top: 18%; left: -10px; width: 68px; height: 68px; border-radius: 50%; transform: rotate(-8deg);
+  position: absolute; z-index: 2; top: -30px; left: -14px; width: 96px; height: 96px; border-radius: 50%; transform: rotate(-8deg);
   box-shadow: 0 0 0 2.5px var(--b), 0 0 0 5px var(--gold), 0 4px 8px 4px rgba(40, 25, 10, 0.3);
 }
 .poster .banner { position: absolute; z-index: 2; left: -8px; right: -8px; bottom: -28px; margin: 0 auto; text-align: center; }
 .poster .banner span { white-space: nowrap; }
 .done .from { margin: 0 0 6px; color: var(--muted); font-size: 15px; }
 .done .top .crest { visibility: hidden; }   /* on the poster instead */
+.arrow svg { width: 22px; height: 22px; }
