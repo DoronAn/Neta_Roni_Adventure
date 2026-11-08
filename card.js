@@ -11,8 +11,9 @@ const HeroCard = (() => {
 
   const fonts = () => Promise.all(["700 80px Karantina", "700 30px Heebo"].map((f) => document.fonts.load(f)));
 
-  function arch(ctx, x, y, w, h, ry) {          // a window with a rounded top, square at the bottom
-    ctx.beginPath(); ctx.moveTo(x, y + h); ctx.lineTo(x, y + ry);
+  function arch(ctx, x, y, w, h, ry, fresh = true) {   // a window with a rounded top, square at the bottom (clockwise)
+    if (fresh) ctx.beginPath();
+    ctx.moveTo(x, y + h); ctx.lineTo(x, y + ry);
     ctx.ellipse(x + w / 2, y + ry, w / 2, ry, 0, Math.PI, 2 * Math.PI); ctx.lineTo(x + w, y + h); ctx.closePath();
   }
   function star(ctx, cx, cy, r, fill) {
@@ -54,32 +55,46 @@ const HeroCard = (() => {
     ctx.lineWidth = 22; ctx.strokeStyle = C.a; ctx.strokeRect(11, 11, W - 22, H - 22);
     ctx.lineWidth = 6; ctx.strokeStyle = C.b; ctx.strokeRect(33, 33, W - 66, H - 66);
 
-    // The window: the homeland's scene, the hero standing in it as a sticker.
+    // The window: an arch onto the homeland, with the crest set into its top like a keystone. The mat, the gold line
+    // and the team line run around the arch and the crest as one shape (both drawn clockwise, so their union fills).
     const X = 90, Y = 150, WW = 1020, WH = 750, RY = 280;
+    const CR = 76, CX = W / 2, CY = Y + 6, CRING = CR + 12;
+    const shape = (grow) => {
+      arch(ctx, X - grow, Y - grow, WW + 2 * grow, WH + 2 * grow, RY + grow);
+      ctx.moveTo(CX + CRING + grow, CY); ctx.arc(CX, CY, CRING + grow, 0, 2 * Math.PI);
+    };
     ctx.save(); ctx.shadowColor = "rgba(60,40,10,0.35)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
-    arch(ctx, X - 18, Y - 18, WW + 36, WH + 36, RY + 18); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
-    arch(ctx, X - 11, Y - 11, WW + 22, WH + 22, RY + 11); ctx.lineWidth = 7; ctx.strokeStyle = GOLD; ctx.stroke();
+    shape(22); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
+    shape(15); ctx.fillStyle = GOLD; ctx.fill();
+    shape(9); ctx.fillStyle = CARD; ctx.fill();
+    shape(5); ctx.fillStyle = C.b; ctx.fill();
+
+    // The scene, paler than painted and lit behind the hero, so the hero stands out.
     ctx.save(); arch(ctx, X, Y, WW, WH, RY); ctx.clip();
     ctx.drawImage(scene, X, Y, WW, WH);
-    const dim = ctx.createRadialGradient(X + WW / 2, Y + WH * 0.55, WH * 0.35, X + WW / 2, Y + WH * 0.55, WH * 0.85);
-    dim.addColorStop(0, "rgba(40,25,10,0)"); dim.addColorStop(1, "rgba(40,25,10,0.45)");
+    ctx.fillStyle = "rgba(250,244,228,0.36)"; ctx.fillRect(X, Y, WW, WH);
+    const HX = X + WW / 2, HY = Y + WH * 0.56;
+    const glow = ctx.createRadialGradient(HX, HY, 40, HX, HY, 470);
+    glow.addColorStop(0, "rgba(255,250,236,0.55)"); glow.addColorStop(1, "rgba(255,250,236,0)");
+    ctx.fillStyle = glow; ctx.fillRect(X, Y, WW, WH);
+    const dim = ctx.createRadialGradient(HX, HY, WH * 0.45, HX, HY, WH * 0.9);
+    dim.addColorStop(0, "rgba(60,40,15,0)"); dim.addColorStop(1, "rgba(60,40,15,0.22)");
     ctx.fillStyle = dim; ctx.fillRect(X, Y, WW, WH);
     const ground = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-    ground.addColorStop(0, "rgba(25,15,5,0.5)"); ground.addColorStop(1, "rgba(25,15,5,0)");
-    ctx.save(); ctx.translate(X + WW / 2, Y + WH - 86); ctx.scale(280, 30); ctx.fillStyle = ground; ctx.beginPath(); ctx.arc(0, 0, 1, 0, 2 * Math.PI); ctx.fill(); ctx.restore();
-    // the hero stands above the name ribbon (its top edge is 70 px above the window's foot), clear of the crest
-    const hc = document.createElement("canvas"); hc.width = 900; hc.height = 590;
+    ground.addColorStop(0, "rgba(25,15,5,0.38)"); ground.addColorStop(1, "rgba(25,15,5,0)");
+    ctx.save(); ctx.translate(HX, Y + WH - 86); ctx.scale(280, 30); ctx.fillStyle = ground; ctx.beginPath(); ctx.arc(0, 0, 1, 0, 2 * Math.PI); ctx.fill(); ctx.restore();
+    // the hero stands above the name ribbon (its top edge is 70 px above the window's foot), below the crest
+    const hc = document.createElement("canvas"); hc.width = 900; hc.height = 570;
     await HeroArt.draw(hc, h, { part: "all", keepSize: true, dpr: 1, outline: 10 });
-    ctx.drawImage(hc, X + (WW - 900) / 2, Y + WH - 590 - 72);
+    ctx.drawImage(hc, X + (WW - 900) / 2, Y + WH - 570 - 72);
     ctx.restore();
-    arch(ctx, X, Y, WW, WH, RY); ctx.lineWidth = 7; ctx.strokeStyle = C.b; ctx.stroke();
 
-    // The crest, the window's keystone.
-    const CR = 84, CX = W / 2, CY = Y + 2;
-    ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.4)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
-    ctx.beginPath(); ctx.arc(CX, CY, CR + 13, 0, 2 * Math.PI); ctx.fillStyle = GOLD; ctx.fill(); ctx.restore();
-    ctx.beginPath(); ctx.arc(CX, CY, CR + 6, 0, 2 * Math.PI); ctx.fillStyle = C.b; ctx.fill();
+    // The crest, in the frame's own rings: the team line, then gold, as the arch's border runs into it.
+    ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.3)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 4;
+    ctx.beginPath(); ctx.arc(CX, CY, CRING, 0, 2 * Math.PI); ctx.fillStyle = C.b; ctx.fill(); ctx.restore();
+    ctx.beginPath(); ctx.arc(CX, CY, CR + 6, 0, 2 * Math.PI); ctx.fillStyle = GOLD; ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.arc(CX, CY, CR, 0, 2 * Math.PI); ctx.clip(); ctx.drawImage(crest, CX - CR, CY - CR, 2 * CR, 2 * CR); ctx.restore();
+    for (const sx of [-1, 1]) star(ctx, CX + sx * (CRING + 40), Y - 2, 13, GOLD);   // two small gold stars beside it
 
     // The name, on a ribbon across the window's foot.
     const name = (h.name || "").trim();
