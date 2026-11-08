@@ -55,24 +55,17 @@ const HeroCard = (() => {
     ctx.lineWidth = 22; ctx.strokeStyle = C.a; ctx.strokeRect(11, 11, W - 22, H - 22);
     ctx.lineWidth = 6; ctx.strokeStyle = C.b; ctx.strokeRect(33, 33, W - 66, H - 66);
 
-    // The window: a gate. An arch onto the homeland, and at its top the crest in a medallion that the frame rings
-    // all the way round, above and below, so arch and crest are one piece. The frame, from the window outward: the
-    // team line, cream, the gold line, the cream mat; the medallion repeats it around the crest.
-    const X = 90, Y = 150, WW = 1020, WH = 750, RY = 280;
-    const CR = 72, CX = W / 2, CY = Y + 4;
-    const R = { rim: CR + 4, team: CR + 9, gap: CR + 13, gold: CR + 19, halo: CR + 26, mat: CR + 32 };
+    // The window: a gate. An arch onto the homeland whose two frame lines part at the top to hold the crest: the gold
+    // line arches over it, the team line curves under it.
+    const X = 90, Y = 160, WW = 1020, WH = 740, RY = 280;
+    const R = 92, CX = W / 2, CY = Y - 7;          // the ring the two lines make round the crest, between the lines
     const disc = (r) => { ctx.moveTo(CX + r, CY); ctx.arc(CX, CY, r, 0, 2 * Math.PI); };
-    // the mat behind it all: the arch and the medallion as one shape (both drawn clockwise, so they unite)
+    const outside = (path) => { ctx.beginPath(); ctx.rect(0, 0, W, H); path(); ctx.clip("evenodd"); };
+    const goldArch = () => arch(ctx, X - 12, Y - 12, WW + 24, WH + 24, RY + 12, false);
+    const teamArch = () => arch(ctx, X - 2.5, Y - 2.5, WW + 5, WH + 5, RY + 2.5, false);
+    // the mat behind the arch and the crest (both drawn clockwise, so they unite)
     ctx.save(); ctx.shadowColor = "rgba(60,40,10,0.35)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10;
-    arch(ctx, X - 22, Y - 22, WW + 44, WH + 44, RY + 22); disc(R.mat); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
-    // the arch's gold line and team line, running into the medallion's gold ring (drawn again after the medallion's halo)
-    const frameLines = () => {
-      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); disc(R.gold - 1); ctx.clip("evenodd");
-      arch(ctx, X - 12, Y - 12, WW + 24, WH + 24, RY + 12); ctx.lineWidth = 6; ctx.strokeStyle = GOLD; ctx.stroke();
-      arch(ctx, X - 2.5, Y - 2.5, WW + 5, WH + 5, RY + 2.5); ctx.lineWidth = 5; ctx.strokeStyle = C.b; ctx.stroke();
-      ctx.restore();
-    };
-    frameLines();
+    arch(ctx, X - 22, Y - 22, WW + 44, WH + 44, RY + 22); disc(R + 10); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
 
     // The scene, brighter than painted (screened, so its colours stay clear) and lit behind the hero.
     ctx.save(); arch(ctx, X, Y, WW, WH, RY); ctx.clip();
@@ -86,19 +79,27 @@ const HeroCard = (() => {
     const ground = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
     ground.addColorStop(0, "rgba(25,15,5,0.36)"); ground.addColorStop(1, "rgba(25,15,5,0)");
     ctx.save(); ctx.translate(HX, Y + WH - 86); ctx.scale(280, 30); ctx.fillStyle = ground; ctx.beginPath(); ctx.arc(0, 0, 1, 0, 2 * Math.PI); ctx.fill(); ctx.restore();
-    // the hero stands above the name ribbon (its top edge is 70 px above the window's foot), below the medallion
+    // the hero stands above the name ribbon (its top edge is 70 px above the window's foot), below the crest
     const hc = document.createElement("canvas"); hc.width = 900; hc.height = 560;
     await HeroArt.draw(hc, h, { part: "all", keepSize: true, dpr: 1, outline: 10 });
     ctx.drawImage(hc, X + (WW - 900) / 2, Y + WH - 560 - 72);
     ctx.restore();
 
-    // The medallion: the frame's bands wrapped all the way round the crest.
-    ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.35)"; ctx.shadowBlur = 14; ctx.shadowOffsetY = 5;
-    ctx.beginPath(); disc(R.halo); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
-    frameLines();
-    for (const [r, colour] of [[R.gold, GOLD], [R.gap, CARD], [R.team, C.b], [R.rim, GOLD]]) { ctx.beginPath(); disc(r); ctx.fillStyle = colour; ctx.fill(); }
-    ctx.save(); ctx.beginPath(); disc(CR); ctx.clip(); ctx.drawImage(crest, CX - CR, CY - CR, 2 * CR, 2 * CR); ctx.restore();
-    for (const sx of [-1, 1]) star(ctx, CX + sx * (R.mat + 34), Y - 12, 13, GOLD);   // a small gold star either side, on the gold line
+    // The crest, filling the ring.
+    ctx.save(); ctx.shadowColor = "rgba(40,25,10,0.35)"; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+    ctx.beginPath(); disc(R - 2); ctx.fillStyle = CARD; ctx.fill(); ctx.restore();
+    ctx.save(); ctx.beginPath(); disc(R - 2); ctx.clip(); ctx.drawImage(crest, CX - R + 2, CY - R + 2, 2 * R - 4, 2 * R - 4); ctx.restore();
+    // The gold line: along the arch, then over the crest (the part of the ring outside the gold arch).
+    ctx.save(); outside(() => disc(R)); ctx.beginPath(); goldArch(); ctx.lineWidth = 6; ctx.strokeStyle = GOLD; ctx.stroke(); ctx.restore();
+    ctx.save(); outside(goldArch); ctx.beginPath(); disc(R); ctx.lineWidth = 6; ctx.strokeStyle = GOLD; ctx.stroke(); ctx.restore();
+    // The team line: along the arch, then under the crest (the part of the ring inside the team arch).
+    ctx.save(); outside(() => disc(R)); ctx.beginPath(); teamArch(); ctx.lineWidth = 5; ctx.strokeStyle = C.b; ctx.stroke(); ctx.restore();
+    ctx.save(); ctx.beginPath(); teamArch(); ctx.clip(); ctx.beginPath(); disc(R); ctx.lineWidth = 5; ctx.strokeStyle = C.b; ctx.stroke(); ctx.restore();
+    // a small gold star on the gold line either side of the crest
+    for (const sx of [-1, 1]) {
+      const dx = R + 46, a = WW / 2 + 12, ry = RY + 12;
+      star(ctx, CX + sx * dx, Y - 12 + ry * (1 - Math.sqrt(1 - (dx / a) ** 2)), 13, GOLD);
+    }
 
     // The name, on a ribbon across the window's foot.
     const name = (h.name || "").trim();
