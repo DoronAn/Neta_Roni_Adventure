@@ -19,6 +19,7 @@ function problems(text, gender) {
   const out = [], other = gender === "f" ? 0 : 1;
   for (const p of pairs) if (p[0] !== p[1] && has(text, p[other])) out.push(`${gender} uses "${p[other]}": ${text}`);
   if (!text.includes("המגן")) out.push(`no shield: ${text}`);
+  if (text.includes("שברי")) out.push(`"שברי" (Doron: the shield's pieces are "חלקי"): ${text}`);
   if (/undefined|null|\$\{/.test(text)) out.push(`template hole: ${text}`);
   return out;
 }
@@ -34,7 +35,7 @@ for (const kid of kids) for (const gender of ["m", "f"]) for (const species of O
   const good = HeroStory.write({ kid: 2, gender: "f", species: "elf", cls: "bard", homeland: "sea", strengths: ["str", "dex"], pet: "fox", name: "שירה", storySeed: 0 });
   if (problems(good, "f").length || !problems(good.replace("בשירים שלה", "בשירים שלו"), "f").length) { console.error("the checker is broken"); process.exit(1); }
 }
-if (process.argv.includes("--show")) for (const [kid, g, sp, cl, hl, s, pet, seed] of [[2, "f", "elf", "ranger", "valley", ["dex", "wis"], "fox", 0], [6, "m", "dwarf", "barbarian", "caves", ["str", "con"], "frog", 1], [0, "f", "fairy", "bard", "forest", ["cha", "int"], "none", 2], [1, "f", "tabaxi", "rogue", "desert", ["dex", "int"], "cat", 0]])
+if (process.argv.includes("--show")) for (const [kid, g, sp, cl, hl, s, pet, seed] of [[2, "f", "elf", "ranger", "valley", ["dex", "wis"], "fox", 0], [6, "m", "dwarf", "barbarian", "caves", ["str", "con"], "frog", 1], [0, "f", "fairy", "bard", "forest", ["cha", "int"], "none", 2], [1, "m", "tabaxi", "rogue", "desert", ["dex", "int"], "cat", 0]])
   console.log(HeroStory.write({ kid, gender: g, species: sp, cls: cl, homeland: hl, strengths: s, pet, name: g === "f" ? "שירה האמיצה" : "יואב האמיץ", storySeed: seed }) + "\n");
 if (bad.length) { console.error(bad.slice(0, 10).join("\n")); console.error(`${bad.length} problems in ${n} stories`); process.exit(1); }
 console.log(`ok: ${n} stories, each in one gender and set in the shield's legend`);
