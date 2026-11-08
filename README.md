@@ -2,7 +2,7 @@
 
 A hero generator for a D&D treasure-hunt birthday party. Kids build a hero on a parent's phone and keep the hero card as an image. It's a static site on GitHub Pages, with no server and no database. The scope, the gates and the reasoning are in **[PLAN.md](PLAN.md)**.
 
-**Status (2026-11-08):** the hero is drawn from painted parts (a head on a body, with headwear and a companion), and the screens are built: the legend, your name, hero or heroine, species, class, outfit colour, headwear, companion, two strengths, the hero's name, the homeland and the backstory, the reveal (two dice roll for the strengths, then the card flies in), and the finished hero as a card (a picture to save and share). Still to come: a print page.
+**Status (2026-11-08):** the hero is drawn from painted parts (a head on a body, with headwear and a companion), and the screens are built: the legend, your name, hero or heroine, species, class, outfit colour, headwear, companion, two strengths, the hero's name, the homeland and the backstory, the reveal (two dice roll for the strengths, then the card flies in), and the finished hero as a card (a picture to save and share). A print page turns a card's code into a round relief of the hero for 3D printing.
 
 > **This repo is public.** First names are fine; never commit surnames, the address, photos or phone numbers.
 
@@ -19,6 +19,7 @@ Then open http://localhost:8000. Opening the file directly breaks the pictures i
 - `story.js`: the backstory, written from the kid's choices in the hero's gender and set in the legend of the broken shield. A kid can ask for another version or rewrite it.
 - `card.js`: the hero card, 1200 × 1800 (a 10 × 15 cm print), in the team's colours. The last screen shows it, with a button that opens the phone's share sheet (WhatsApp, Photos) or, where there is none, downloads it.
 - `sound.js`: the reveal's sounds (dice, chimes, a fanfare), made in the browser; no sound files.
+- `print.html`, `print.js`, `relief.js`: the print page (not linked from the site): a hero code in, a round head-and-shoulders relief out, previewed and downloaded as STL. Every size is a setting.
 - `code.js`: the hero code (`XXX-XXXX`) printed on the card, which rebuilds the hero's picture.
 - `catalog.js`: species, classes, strengths, colours, headwear, companions, homelands and name ideas, in Hebrew masculine and feminine forms. **The Hebrew is a draft**; rename freely, but don't change keys or reorder lists (the hero code stores positions).
 - `kids.js`: the guests' first names and teams. Add new names at the end.

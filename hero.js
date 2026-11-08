@@ -30,7 +30,8 @@ const HeroArt = (() => {
     return PARTS.hat_src.replace("{hat}", name).replace("{cls}", h.cls).replace("{col}", h.colour || "original");
   }
 
-  // The layers, back to front. part: "all" (the whole hero), "head" (head and hat only), "body" (no hat or pet).
+  // The layers, back to front. part: "all" (the whole hero), "head" (head and hat only), "body" (no hat or pet),
+  // "portrait" (the hero without the companion: for the print page's head-and-shoulders relief).
   function layers(h, part = "all") {
     const out = [];
     const key = headKey(h);
@@ -120,5 +121,13 @@ const HeroArt = (() => {
   // Fetches the pictures a hero needs ahead of time, so the next screen draws at once.
   function preload(h, part = "all") { layers(h, part).forEach((l) => load(l.src).catch(() => {})); }
 
-  return { draw, preload, layers, load };
+  // The hero's extent in hero space, [x0, y0, x1, y1], over the given part's layers.
+  async function bounds(h, part = "all") {
+    const ls = layers(h, part), ims = await Promise.all(ls.map((l) => load(l.src)));
+    let f = [Infinity, Infinity, -Infinity, -Infinity];
+    ims.forEach((im, i) => { const r = rect(im, ls[i].m); f = [Math.min(f[0], r[0]), Math.min(f[1], r[1]), Math.max(f[2], r[2]), Math.max(f[3], r[3])]; });
+    return f;
+  }
+
+  return { draw, preload, layers, load, bounds };
 })();

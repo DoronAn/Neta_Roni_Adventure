@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>תבליט להדפסה</title>
+  <style>
+    @font-face { font-family: "Karantina"; font-weight: 700; src: url("fonts/Karantina_700Bold.ttf") format("truetype"); }
+    @font-face { font-family: "Heebo"; font-weight: 700; src: url("fonts/Heebo_700Bold.ttf") format("truetype"); }
+    :root { --teal: #175e60; --orange: #dd6a14; --paper: #f0e4c8; --card: #f8f0dd; --ink: #183b3c; --muted: #56706f; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper) url("ui/parchment.jpg"); background-size: 300px; color: var(--ink); font: 700 16px/1.45 "Heebo", system-ui, sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; }
+    h1 { font: 700 54px/1 "Karantina", sans-serif; color: var(--teal); margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 18px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    input[type=text] { font: 700 26px/1 ui-monospace, Menlo, Consolas, monospace; letter-spacing: 3px; direction: ltr; text-align: center; width: 220px; padding: 10px; border: 2.5px solid var(--teal); border-radius: 10px; background: var(--card); color: var(--ink); text-transform: uppercase; }
+    button { font: 700 22px/1 "Karantina", "Heebo", sans-serif; padding: 12px 20px; border: 0; border-radius: 10px; background: var(--orange); color: #fbf1dc; cursor: pointer; }
+    button:disabled { background: #b8ab94; cursor: default; }
+    button.ghost { background: none; color: var(--teal); box-shadow: inset 0 0 0 2px var(--teal); }
+    .err { color: #b3261e; margin: 10px 0 0; min-height: 1.4em; }
+    .who { font: 700 34px/1.1 "Karantina", sans-serif; color: var(--orange); margin: 16px 0 2px; }
+    .views { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 14px 0; }
+    .views figure { margin: 0; text-align: center; color: var(--muted); }
+    .views canvas { width: 100%; aspect-ratio: 1; display: block; border-radius: 50%; background: #fff8; box-shadow: 0 6px 16px rgba(60, 40, 10, 0.25); }
+    details { background: var(--card); border: 2px solid var(--teal); border-radius: 10px; padding: 10px 14px; margin: 14px 0; }
+    summary { cursor: pointer; color: var(--teal); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px 16px; margin-top: 10px; }
+    .grid label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; }
+    .grid input { width: 80px; font: 700 15px "Heebo", sans-serif; padding: 4px 6px; border: 1.5px solid #c9b58c; border-radius: 6px; direction: ltr; }
+    .stats { color: var(--muted); font-size: 14px; }
+    .note { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>תבליט להדפסה</h1>
+    <p class="sub">הקוד מכרטיס הגיבור ← תבליט עגול של הגיבור (ראש וכתפיים, עם הכובע, בלי חיית הלוויה) וקובץ STL להדפסה בתלת־ממד.</p>
+    <div class="row">
+      <input type="text" id="code" placeholder="XXX-XXXX" maxlength="9" autocomplete="off" spellcheck="false">
+      <button id="make">הכנה</button>
+    </div>
+    <p class="err" id="err"></p>
+    <section id="out" hidden>
+      <p class="who" id="who"></p>
+      <p class="note" id="who2"></p>
+      <div class="views">
+        <figure><canvas id="relief"></canvas><figcaption>התבליט</figcaption></figure>
+        <figure><canvas id="portrait"></canvas><figcaption>הדמות שממנה הוא נבנה</figcaption></figure>
+      </div>
+      <div class="row"><button id="download" disabled>הורדת קובץ STL</button><span class="stats" id="stats"></span></div>
+    </section>
+    <details>
+      <summary>מידות (במילימטרים)</summary>
+      <div class="grid" id="settings"></div>
+      <p class="note">הבסיס עבה משקע המגנט כדי שהשקע לא יחורר את התבליט. אחרי שינוי מידה לוחצים שוב על "הכנה".</p>
+    </details>
+  </main>
+  <script src="kids.js"></script>
+  <script src="catalog.js"></script>
+  <script src="parts.js"></script>
+  <script src="hero.js"></script>
+  <script src="code.js"></script>
+  <script src="relief.js"></script>
+  <script src="print.js"></script>
+</body>
+</html>
