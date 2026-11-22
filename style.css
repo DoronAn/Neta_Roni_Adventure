@@ -148,9 +148,9 @@ h2 em { font-style: normal; color: var(--a); }
 .legend .text::after { content: ""; display: block; clear: both; }
 
 /* ---- who are you ---- */
-.team { margin: 4px 0 16px; }
-.team-head { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 10px; }
-.team-head img { width: 54px; height: 54px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--b), 0 0 0 5px var(--gold); }
+.team { margin: 0 0 8px; }   /* tight, so a sliver of "המשך" shows under the names on most phones (Doron) */
+.team-head { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0 0 6px; }
+.team-head img { width: 48px; height: 48px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--b), 0 0 0 5px var(--gold); }
 .ribbon {
   position: relative; display: inline-block; color: #fbf1dc; padding: 6px 22px 3px;
   font: 700 28px/1 "Karantina", sans-serif; background: var(--tc, var(--a));
@@ -158,8 +158,9 @@ h2 em { font-style: normal; color: var(--a); }
 }
 .team.neta { --tc: var(--teal-2); }
 .team.roni { --tc: var(--orange); }
-.names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.names .card { padding: 12px 6px 9px; font: 700 30px/1 "Karantina", sans-serif; color: var(--b); border-color: var(--tc); }
+.names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+.team ~ .bar.inline { margin-top: 8px; }
+.names .card { padding: 8px 6px 6px; font: 700 30px/1 "Karantina", sans-serif; color: var(--b); border-color: var(--tc); }
 
 .genders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
 .genders .card .name { font-size: 40px; }
