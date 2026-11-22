@@ -79,6 +79,8 @@ body {
 
 /* ---- headings ---- */
 .kicker { text-align: center; color: var(--a); font-size: 15px; letter-spacing: 0.5px; margin: 6px 0 0; }
+/* Under the top bar, the chapter sits as far below the progress stars as the divider sits below the headline (Doron). */
+.top + .kicker { margin-top: -14px; pointer-events: none; }
 h2 {
   font: 700 46px/0.95 "Karantina", "Secular One", sans-serif; color: var(--b);
   text-align: center; margin: 2px 0 6px;
