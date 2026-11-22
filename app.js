@@ -47,10 +47,8 @@
   function top() {
     const i = ["reveal", "done"].includes(hero.step) ? DOTTED.length : DOTTED.indexOf(hero.step);
     const stars = DOTTED.map((st, j) => UI.star(j < i ? "on" : j === i ? "now" : "")).join("");
-    // The name page shows both crests by the team names, so its bar has no crest and sits lower, lifting the headline.
-    const tight = hero.step === "kid";
-    const crest = kid() && !tight ? `<img class="crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">` : `<span class="crest none"></span>`;
-    return `<div class="top${tight ? " tight" : ""}"><button class="back" data-act="back" aria-label="חזרה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="progress">${stars}</div>${crest}</div>`;
+    const crest = kid() ? `<img class="crest" src="${PARTS.crests[kid().team]}" alt="${TEAMS[kid().team].he}">` : `<span class="crest none"></span>`;
+    return `<div class="top"><button class="back" data-act="back" aria-label="חזרה"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="progress">${stars}</div>${crest}</div>`;
   }
   // A chapter heading: "פרק ג׳", the title (a word in <em> turns red), and a star divider unless it's tight.
   const head = (title, divider = true) =>

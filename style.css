@@ -76,9 +76,6 @@ body {
 .progress svg.now { fill: var(--gold); stroke: var(--b); opacity: 1; transform: scale(1.45); }
 .crest { flex: none; width: 64px; height: 64px; border-radius: 50%; box-shadow: 0 0 0 2.5px var(--b), 0 0 0 5px var(--gold), 0 3px 6px 5px rgba(60, 40, 10, 0.18); }
 .crest.none { visibility: hidden; }
-.top.tight { min-height: 42px; }
-.top.tight .crest { height: 40px; box-shadow: none; }
-.top.tight + .kicker { margin-top: 2px; }
 
 /* ---- headings ---- */
 .kicker { text-align: center; color: var(--a); font-size: 15px; letter-spacing: 0.5px; margin: 6px 0 0; }
