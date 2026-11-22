@@ -110,7 +110,7 @@
           <div class="team-head"><img src="${PARTS.crests[k]}" alt=""><span class="ribbon">${TEAMS[k].he}</span></div>
           <div class="names">${KIDS.map((c, i) => (c.team === k ? `<button class="card ${hero.kid === i ? "on" : ""}" data-act="kid" data-v="${i}">${esc(c.name)}</button>` : "")).join("")}</div>
         </div>`;
-      return `${top()}${head("איך <em>קוראים</em> לך?")}${team("neta")}${team("roni")}${bar("המשך", !!kid())}`;
+      return `${top()}${head("איך <em>קוראים</em> לך?")}${team("neta")}${team("roni")}${bar("המשך", !!kid(), "next", true)}`;
     },
 
     gender() {
@@ -316,7 +316,12 @@
   const ACTS = {
     back,
     next,
-    kid: (v) => { set({ kid: +v }); teamClass(); render(); },
+    kid: (v) => {
+      set({ kid: +v }); teamClass(); render();
+      // "המשך" sits under the names on this page (Doron): once a name is tapped, bring the whole button into view.
+      const bar = app.querySelector(".bar"), btn = bar && bar.querySelector(".btn");
+      if (btn && btn.getBoundingClientRect().bottom > window.innerHeight - 10) bar.scrollIntoView({ block: "end", behavior: "smooth" });
+    },
     gender: (v) => { set({ gender: v }); render(); },
     species: (v) => { set({ species: v }); render(); },
     cls: (v) => { set({ cls: v }); render(); },
