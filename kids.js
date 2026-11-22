@@ -12,13 +12,12 @@ const TEAMS = {
 const KIDS = [
   { name: "נטע", team: "neta", leader: true },
   { name: "רוני", team: "roni", leader: true },
-  // Placeholders until the real names arrive.
-  { name: "גיבור 1", team: "neta" },
-  { name: "גיבור 2", team: "neta" },
-  { name: "גיבור 3", team: "neta" },
-  { name: "גיבור 4", team: "neta" },
-  { name: "גיבור 5", team: "roni" },
-  { name: "גיבור 6", team: "roni" },
-  { name: "גיבור 7", team: "roni" },
-  { name: "גיבור 8", team: "roni" },
+  { name: "נדב", team: "neta" },
+  { name: "אדר", team: "neta" },
+  { name: "עלמה", team: "neta" },
+  { name: "לביא", team: "neta" },
+  { name: "עומר", team: "roni" },
+  { name: "אילן", team: "roni" },
+  { name: "ראם", team: "roni" },
+  { name: "יותם", team: "roni" },
 ];
