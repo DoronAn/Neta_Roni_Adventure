@@ -206,7 +206,7 @@
         <div class="card-frame"><img id="hero-card" alt="${t("כרטיס הגיבור", "כרטיס הגיבורה")} ${esc(hero.name)}"><p class="card-wait">${t("מכינים את כרטיס הגיבור…", "מכינים את כרטיס הגיבורה…")}</p></div>
         <button class="btn" data-act="share" disabled>שמירה ושליחה</button>
         <p class="hint">שמרו את הכרטיס ושלחו אותו אלינו בווטסאפ. בטלפון אפשר גם ללחוץ לחיצה ארוכה על הכרטיס כדי לשמור אותו.</p>
-        <p class="costume">בואו מחופשים ${t("לגיבור", "לגיבורה")} שיצרתם!</p>
+        <p class="costume">מוזמנים להגיע מחופשים לדמות שיצרתם!</p>
         <div class="stack">
           <button class="btn ghost small" data-act="edit">לשנות משהו</button>
           <button class="btn ghost small" data-act="restart">להתחיל מחדש</button>
