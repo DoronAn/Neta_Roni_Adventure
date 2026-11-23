@@ -4,8 +4,8 @@
 const GALLERY = {
   0: "gallery/0.jpg",    // נטע, 2026-11-23
   1: "gallery/1.jpg",    // רוני, 2026-11-23
-  4: "gallery/4.jpg",    // עלמה, 2026-11-23
+  4: "gallery/4.jpg",    // עלמה, 2026-11-23 ("עלמה ילדת הירח": renamed by Doron, re-made from the code)
   5: "gallery/5.jpg",    // לביא, 2026-11-23
   7: "gallery/7.jpg",    // אילן, 2026-11-23
-  8: "gallery/8.jpg",    // ראם, 2026-11-23
+  8: "gallery/8.jpg",    // ראם, 2026-11-23 ("ראם חומק הצללים": renamed by Doron, re-made from the code)
 };
