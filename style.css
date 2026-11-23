@@ -357,7 +357,8 @@ textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; 
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
 .deck-count { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
 .gallery .hint { margin: 4px 8px 0; }
-.legend .to-gallery { margin-top: 12px; }
+.legend .bar.pair { display: grid; grid-template-columns: 1fr auto; gap: 10px; }   /* the gallery beside the way in (Doron) */
+.legend .to-gallery { padding-inline: 16px; }
 .done .to-gallery { margin-top: 14px; }
 
 /* a card shown big over the gallery */

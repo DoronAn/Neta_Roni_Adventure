@@ -118,8 +118,8 @@
           <p>האגדה מספרת על קבוצת גיבורים ישרי לב ומלאי עוז שיתקבצו מכל קצוות הממלכה, ימצאו את שברי המגן ויאחו את פצעי הזמן.</p>
         </div>
         <p class="call big">נטע ורוני יוצאות למסע,<br>וקוראות לגיבורים האמיצים ביותר לבוא ולהצטרף אליהן באתגר הגדול.</p>
-        <div class="bar inline"><button class="btn" data-act="next">יוצאים למסע!</button>
-          <button class="btn ghost small to-gallery" data-act="gallery">לראות את החבורות</button></div>
+        <div class="bar inline pair"><button class="btn" data-act="next">יוצאים למסע!</button>
+          <button class="btn ghost small to-gallery" data-act="gallery">הגיבורים</button></div>
       </section>`;
     },
 
