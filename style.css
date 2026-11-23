@@ -92,14 +92,14 @@ h2 em { font-style: normal; color: var(--a); }
 .btn {
   display: block; width: 100%; border: 0; border-radius: 12px; cursor: pointer;
   font: 700 30px/1 "Karantina", "Heebo", sans-serif; letter-spacing: 0.5px;
-  padding: 14px 18px 12px; color: #fbf1dc; background: var(--a);
+  padding: 12px 18px 14px; color: #fbf1dc; background: var(--a);   /* Karantina sits low: 2px more below than above centres it */
   outline: 2px dashed rgba(251, 241, 220, 0.75); outline-offset: -7px;
   box-shadow: 0 4px 0 var(--a-dark), 0 6px 12px rgba(80, 30, 10, 0.25);
 }
 .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--a-dark); }
 .btn:disabled { background: #b8ab94; outline-color: rgba(255, 255, 255, 0.5); box-shadow: 0 4px 0 #8f8471; cursor: default; }
 .btn.ghost { background: transparent; color: var(--b); outline: 0; box-shadow: inset 0 0 0 2.5px var(--b); font-size: 26px; }
-.btn.small { font-size: 22px; padding: 10px 14px 8px; }
+.btn.small { font-size: 22px; padding: 8px 14px 10px; }
 .bar {
   position: sticky; bottom: 0; z-index: 5; margin: auto calc(-1 * var(--frame) - 10px) 0;
   padding: 12px calc(var(--frame) + 10px) calc(var(--frame) + 10px + env(safe-area-inset-bottom));

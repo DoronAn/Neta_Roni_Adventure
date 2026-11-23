@@ -225,7 +225,7 @@
         <button class="btn" data-act="share" disabled>שמירה ושליחה</button>
         <p class="hint">שמרו את הכרטיס ושלחו אותו אלינו בווטסאפ. בטלפון אפשר גם ללחוץ לחיצה ארוכה על הכרטיס כדי לשמור אותו.</p>
         <p class="costume">מוזמנים להגיע מחופשים לדמות שיצרתם!</p>
-        <button class="btn ghost to-gallery" data-act="gallery">לראות את החבורות</button>
+        <button class="btn ghost to-gallery" data-act="gallery">הגיבורים</button>
         <div class="stack">
           <button class="btn ghost small" data-act="edit">לשנות משהו</button>
           <button class="btn ghost small" data-act="restart">להתחיל מחדש</button>
