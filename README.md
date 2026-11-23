@@ -19,12 +19,12 @@ Then open http://localhost:8000. Opening the file directly breaks the pictures i
 - `story.js`: the backstory, written from the kid's choices in the hero's gender and set in the legend of the broken shield. A kid can ask for another version or rewrite it.
 - `card.js`: the hero card, 1200 × 1800 (a 10 × 15 cm print), in the team's colours. The last screen shows it, with a button that opens the phone's share sheet (WhatsApp, Photos) or, where there is none, downloads it.
 - `sound.js`: the reveal's sounds (dice, chimes, a fanfare), made in the browser; no sound files.
-- `print.html`, `print.js`, `relief.js`: the print page (not linked from the site): a hero code in, a round head-and-shoulders relief out, previewed and downloaded as STL. Every size is a setting.
+- `print.html`, `print.js`, `relief.js`: the print page (not linked from the site): a hero code in, a round 50 mm head-and-shoulders relief on a pattern from the hero's homeland, and a plate with the team's crest for its back, previewed (as the file and as a 0.4 mm nozzle would print it) and downloaded as STL. Every size is a setting. The sculpted forms come from `parts/relief/`, made once by `tools/parts/relief_maps.py` (see `tools/parts/README.md`).
 - `code.js`: the hero code (`XXX-XXXX`) printed on the card, which rebuilds the hero's picture.
 - `catalog.js`: species, classes, strengths, colours, headwear, companions, homelands and name ideas, in Hebrew masculine and feminine forms. **The Hebrew is a draft**; rename freely, but don't change keys or reorder lists (the hero code stores positions).
 - `kids.js`: the guests' first names and teams. Add new names at the end.
 - `parts/raw/`: the painted parts as drawn. `tools/parts/`: the scripts that cut, colour and place them (see its README).
-- `tests/`: `node tests/code.test.js` (every hero survives the code; typos are caught), `node tests/parts.test.js` (every picture exists), `node tests/story.test.js` (every story is in one gender and mentions the shield; `--show` prints a few).
+- `tests/`: `node tests/code.test.js` (every hero survives the code; typos are caught), `node tests/parts.test.js` (every picture exists, the relief pictures included), `node tests/story.test.js` (every story is in one gender and mentions the shield; `--show` prints a few).
 - `fonts/`: the invitation's fonts (SIL OFL).
 - `gallery.js` + `gallery/`: the heroes that have come in, shown in a deck per team (see below). `node tests/gallery.test.js` checks every entry has its image.
 
