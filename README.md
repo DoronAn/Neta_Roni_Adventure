@@ -26,6 +26,16 @@ Then open http://localhost:8000. Opening the file directly breaks the pictures i
 - `parts/raw/`: the painted parts as drawn. `tools/parts/`: the scripts that cut, colour and place them (see its README).
 - `tests/`: `node tests/code.test.js` (every hero survives the code; typos are caught), `node tests/parts.test.js` (every picture exists), `node tests/story.test.js` (every story is in one gender and mentions the shield; `--show` prints a few).
 - `fonts/`: the invitation's fonts (SIL OFL).
+- `gallery.js` + `gallery/`: the heroes that have come in, shown in a deck per team (see below). `node tests/gallery.test.js` checks every entry has its image.
 
 ## Publish
 GitHub Pages deploys `main` from the root folder. A push to `main` goes live within a minute or two.
+
+## The gallery
+"לראות את החבורות" (on the first page and on the card page) opens a deck of cards per team. Every kid has a place: face down with their first name until their hero comes in, then their card face up; tap it to see it big and step through the team's cards.
+
+Heroes come in by hand, from the cards parents send on WhatsApp (the site has no server):
+1. **Read the card first.** The site is public: no surnames, address, phone numbers or photos in the hero's name or story. If there is any, ask before adding.
+2. Shrink it to 600 px wide as `gallery/<position>.jpg`, where the position is the kid's place in `kids.js` (counting from 0).
+3. Add `<position>: "gallery/<position>.jpg",` to `gallery.js`, run `node tests/gallery.test.js`, and push to `main`.
+

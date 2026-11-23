@@ -12,6 +12,8 @@
   // ---------- state ----------
   const blank = () => ({ step: "legend", colour: "original", hat: "none", pet: "none", strengths: [], name: "", story: "", storySeed: 0 });
   let editing = false;
+  let view = null;              // "gallery" while the decks are open (outside the hero's steps, never saved)
+  let viewer = null;            // [team, kid position] of the card shown big over the gallery
   let flyIn = false;            // the card flies in when it arrives from the dice          // the story is open for the kid to rewrite (not saved: a reload shows it closed)
   let hero = load();
   function load() {
@@ -42,7 +44,22 @@
     const i = STEPS.indexOf(hero.step);
     if (i > 0) go(STEPS[i - 1]);
   }
-  window.addEventListener("popstate", (e) => { if (e.state && e.state.step) { set({ step: e.state.step }); render(); } });
+  window.addEventListener("popstate", (e) => {
+    const s = e.state || {};
+    view = s.gallery ? "gallery" : null;
+    viewer = s.card || null;
+    if (s.step) set({ step: s.step });
+    render();
+  });
+  function openGallery() {
+    view = "gallery"; viewer = null;
+    history.pushState({ gallery: true }, "");
+    render(); window.scrollTo(0, 0);
+  }
+  function closeGallery() {
+    if (history.state && history.state.gallery) return history.back();   // popstate puts the kid back where they were
+    view = null; viewer = null; render();
+  }
 
   function top() {
     const i = ["reveal", "done"].includes(hero.step) ? DOTTED.length : DOTTED.indexOf(hero.step);
@@ -101,7 +118,8 @@
           <p>האגדה מספרת על קבוצת גיבורים ישרי לב ומלאי עוז שיתקבצו מכל קצוות הממלכה, ימצאו את שברי המגן ויאחו את פצעי הזמן.</p>
         </div>
         <p class="call big">נטע ורוני יוצאות למסע,<br>וקוראות לגיבורים האמיצים ביותר לבוא ולהצטרף אליהן באתגר הגדול.</p>
-        ${bar("יוצאים למסע!", true, "next", true)}
+        <div class="bar inline"><button class="btn" data-act="next">יוצאים למסע!</button>
+          <button class="btn ghost small to-gallery" data-act="gallery">לראות את החבורות</button></div>
       </section>`;
     },
 
@@ -207,6 +225,7 @@
         <button class="btn" data-act="share" disabled>שמירה ושליחה</button>
         <p class="hint">שמרו את הכרטיס ושלחו אותו אלינו בווטסאפ. בטלפון אפשר גם ללחוץ לחיצה ארוכה על הכרטיס כדי לשמור אותו.</p>
         <p class="costume">מוזמנים להגיע מחופשים לדמות שיצרתם!</p>
+        <button class="btn ghost to-gallery" data-act="gallery">לראות את החבורות</button>
         <div class="stack">
           <button class="btn ghost small" data-act="edit">לשנות משהו</button>
           <button class="btn ghost small" data-act="restart">להתחיל מחדש</button>
@@ -311,6 +330,48 @@
     document.body.appendChild(a); a.click(); a.remove();
   }
 
+  // ---------- the gallery: a deck per team (Doron, 2026-11-23) ----------
+  // Every kid has a place in their team's deck: their card face up once Doron has added it (gallery.js), face down
+  // with their first name until then. A face-up card opens big, with the team's other cards a tap away.
+  const members = (team) => KIDS.map((c, i) => [c, i]).filter(([c]) => c.team === team);
+  const faceUp = (team) => members(team).map(([, i]) => i).filter((i) => GALLERY[i]);
+  const arrow = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  function gallery() {
+    const deck = (team) => {
+      const m = members(team), mid = (m.length - 1) / 2;
+      const cards = m.map(([c, i], j) => {
+        const style = `style="--k:${mid - j}; z-index:${j + 1}"`;
+        return GALLERY[i]
+          ? `<button class="dcard up" ${style} data-act="view" data-v="${team}:${i}"><img src="${GALLERY[i]}" alt="הגיבור של ${esc(c.name)}" loading="lazy"></button>`
+          : `<div class="dcard down" ${style}><span class="who">${esc(c.name)}</span><img src="${PARTS.crests[team]}" alt=""></div>`;
+      }).join("");
+      return `<div class="team ${team}">
+          <div class="team-head"><img src="${PARTS.crests[team]}" alt=""><span class="ribbon">${TEAMS[team].he}</span></div>
+          <div class="deck">${cards}</div>
+          <p class="deck-count">${faceUp(team).length} מתוך ${m.length} גיבורים הגיעו</p>
+        </div>`;
+    };
+    let big = "";
+    if (viewer && GALLERY[viewer[1]]) {
+      const [team, i] = viewer, list = faceUp(team), n = list.length;
+      const nav = n > 1 ? `<div class="viewer-nav">
+          <button class="viewer-arrow" data-act="viewer-step" data-v="-1" aria-label="הקודם">${arrow("M5 12h13M12.5 6.5 18 12l-5.5 5.5")}</button>
+          <span>${list.indexOf(+i) + 1} מתוך ${n}</span>
+          <button class="viewer-arrow" data-act="viewer-step" data-v="1" aria-label="הבא">${arrow("M19 12H6M11.5 6.5 6 12l5.5 5.5")}</button></div>` : "";
+      big = `<div class="viewer ${team}" role="dialog" aria-label="${esc(TEAMS[team].he)}">
+          <button class="viewer-close" data-act="viewer-close" aria-label="סגירה">✕</button>
+          <p class="viewer-who">הגיבור של ${esc(KIDS[i].name)}</p>
+          <img src="${GALLERY[i]}" alt="הגיבור של ${esc(KIDS[i].name)}">${nav}</div>`;
+    }
+    return `<section class="gallery">
+        <div class="top"><button class="back" data-act="gallery-close" aria-label="חזרה">${arrow("M5 12h13M12.5 6.5 18 12l-5.5 5.5")}</button><span class="crest none"></span></div>
+        <p class="kicker">גיבורי המגן השבור</p><h2><em>החבורות</em></h2>${UI.stars()}
+        ${deck("neta")}${deck("roni")}
+        <p class="hint">כאן יופיעו כל הגיבורים, ברגע שהכרטיס שלהם מגיע אלינו.</p>
+        <div class="bar inline"><button class="btn ghost" data-act="gallery-close">חזרה</button></div>
+      </section>${big}`;
+  }
+
   // ---------- what a tap does ----------
   const next = () => go(STEPS[STEPS.indexOf(hero.step) + 1]);
   const ACTS = {
@@ -342,6 +403,15 @@
     share: shareCard,
     roll: (v, b) => rollDice(b),
     edit: () => go("species"),
+    gallery: openGallery,
+    "gallery-close": closeGallery,
+    view: (v) => { viewer = v.split(":"); history.pushState({ gallery: true, card: viewer }, ""); render(); },
+    "viewer-step": (v) => {
+      const list = faceUp(viewer[0]), i = list.indexOf(+viewer[1]);
+      viewer = [viewer[0], String(list[(i + +v + list.length) % list.length])];
+      history.replaceState({ gallery: true, card: viewer }, ""); render();
+    },
+    "viewer-close": () => history.back(),
     restart: () => {
       if (!confirm("להתחיל גיבור חדש? הגיבור הזה יימחק מהטלפון (תמונה שכבר נשמרה נשארת).")) return;
       hero = blank(); save(); teamClass(); go("legend");
@@ -383,6 +453,7 @@
     return step;
   }
   function render() {
+    if (view === "gallery") { app.innerHTML = gallery(); return; }
     const step = ready(hero.step);
     if (step !== hero.step) set({ step });
     app.innerHTML = SCREENS[step]();

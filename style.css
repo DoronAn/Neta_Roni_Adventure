@@ -330,3 +330,48 @@ textarea.scroll.story:focus { outline: 2px solid var(--a); outline-offset: 2px; 
   .reveal .stage.small { min-height: 66px; }
   .reveal h2 { font-size: 40px; }
 }
+
+/* ---- the gallery: a deck per team (Doron, 2026-11-23) ---- */
+/* Five cards fanned from a pivot far below them, so their tops spread like a hand of cards. In right-to-left order
+   the first kid is at the right and each next card lies on top to its left, so every card shows its right side. */
+.gallery { text-align: center; }
+.gallery .top { justify-content: space-between; }
+.gallery .team { margin: 4px 0 4px; }
+.deck { --cw: clamp(68px, 23vw, 112px); position: relative; height: calc(var(--cw) * 1.62 + 28px); }
+.dcard {
+  position: absolute; top: 10px; left: calc(50% - var(--cw) / 2); width: var(--cw); aspect-ratio: 2 / 3;
+  transform-origin: 50% 230%; transform: rotate(calc(var(--k) * 10deg));
+  border: 0; padding: 0; border-radius: 7px; overflow: hidden; font: inherit;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15), 0 4px 10px rgba(60, 40, 10, 0.32);
+}
+.dcard.up { cursor: pointer; background: #f3e7cb; }
+.dcard.up img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.dcard.up:active { transform: rotate(calc(var(--k) * 10deg)) translateY(-4px); }
+.dcard.down {                    /* the card back: the team's colour, a gold frame, the crest, the kid's name */
+  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.12) 75%), var(--tc);
+  box-shadow: inset 0 0 0 4px var(--tc), inset 0 0 0 6px var(--gold), 0 1px 0 rgba(0, 0, 0, 0.15), 0 4px 10px rgba(60, 40, 10, 0.32);
+}
+.dcard.down img { position: absolute; left: 50%; top: 52%; width: 58%; transform: translate(-50%, -50%); border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--gold); opacity: 0.9; }
+.dcard.down .who { position: absolute; top: 9%; right: 9%; color: #fbf1dc; font: 700 calc(var(--cw) * 0.22)/1 "Karantina", sans-serif;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); }
+.deck-count { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+.gallery .hint { margin: 4px 8px 0; }
+.legend .to-gallery { margin-top: 12px; }
+.done .to-gallery { margin-top: 14px; }
+
+/* a card shown big over the gallery */
+.viewer {
+  position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 16px; background: rgba(14, 32, 33, 0.9);
+}
+.viewer img { display: block; max-width: min(86vw, 520px); max-height: 70vh; border-radius: 8px; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); }
+.viewer-who { margin: 0; color: #fbf1dc; font: 700 28px/1 "Karantina", sans-serif; }
+.viewer-close {
+  position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: rgba(251, 241, 220, 0.16); color: #fbf1dc; font: 700 20px/1 "Heebo", sans-serif; cursor: pointer;
+}
+.viewer-nav { display: flex; align-items: center; gap: 20px; color: #fbf1dc; font: 700 18px/1 "Heebo", sans-serif; }
+.viewer-arrow { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: var(--a); color: #fbf1dc; box-shadow: 0 3px 0 var(--a-dark); }
+.viewer-arrow svg { width: 24px; height: 24px; }

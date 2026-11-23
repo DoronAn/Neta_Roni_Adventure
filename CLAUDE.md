@@ -7,6 +7,7 @@ A hero generator for a children's birthday treasure hunt: a static site (plain H
 - **Nothing about how the party ends.** Keep the hunt's surprises out of the code, comments and docs.
 - The hero's pictures are made by `tools/parts/build_web.py`; never edit `parts.js` or `parts/web/` by hand.
 - Don't reorder or rename keys in `catalog.js` and `kids.js`: the hero code stores positions.
+- **The gallery** (`gallery.js`, `gallery/`): Doron forwards a kid's card and says whose it is; add it per README "The gallery" and push it live without asking again (his call, 2026-11-23). Read every card before it goes in: no surnames, address, phone numbers or photos; if there are, ask him first.
 
 ## How we build (Doron, 2026-10-11)
 Everything except chat-ops (todos, logging, status questions, answering questions) goes through
