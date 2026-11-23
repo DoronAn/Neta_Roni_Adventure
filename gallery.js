@@ -2,6 +2,8 @@
 // hero codes, so a name change can't break it), each a card image in gallery/ (600 px wide).
 // Adding a hero: README.md, "The gallery". Each card is read for anything private before it goes in: this site is public.
 const GALLERY = {
+  0: "gallery/0.jpg",    // נטע, 2026-11-23
+  1: "gallery/1.jpg",    // רוני, 2026-11-23
   4: "gallery/4.jpg",    // עלמה, 2026-11-23
   5: "gallery/5.jpg",    // לביא, 2026-11-23
   7: "gallery/7.jpg",    // אילן, 2026-11-23
