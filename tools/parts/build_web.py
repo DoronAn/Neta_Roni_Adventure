@@ -1,6 +1,7 @@
 """Writes the hero's pictures for the site, and parts.js, which says where each one goes.
-python3 build_web.py <repo root> [--js-only]   (run from the working folder with parts/raw/* and tools/parts/* in it)
+python3 build_web.py <repo root> [--js-only | --crests]   (run from the working folder with parts/raw/* and tools/parts/* in it)
 --js-only rewrites parts.js without making the pictures again (the slow part, about 12 minutes).
+--crests makes only the two team crests (seconds); parts.js stays as it is.
 
 Everything is placed in "hero space": body pixels of the 1024 px body pictures, origin at the body picture's
 top-left (a head and its hat reach above it, so y goes negative). Every layer in parts.js carries m = [a, b, c,
@@ -30,6 +31,17 @@ def save(im, name, scale):
 def m6(M): return [round(float(v), 5) for v in (M[0, 0], M[1, 0], M[0, 1], M[1, 1], M[0, 2], M[1, 2])]
 def scale_shift(k, x, y): return np.array([[k, 0, x], [0, k, y], [0, 0, 1.0]])
 def rel(name): return "parts/web/" + name
+
+# Team crests, for the name screen and the card. The rooster is drawn leaning: its correct angle is 6 degrees clockwise
+# (Doron, 2026-11-25), turned round the badge's centre (the badge is round, so only the bird and its seed pile turn).
+CREST_TURN = {"neta": 0, "roni": 6}
+def crest(t):
+    im = cutout(f"crest_{t}.jpg"); im = im.crop(im.getbbox())
+    if CREST_TURN[t]: im = im.rotate(-CREST_TURN[t], resample=Image.BICUBIC, center=(im.width / 2, im.height / 2))
+    return save(im, f"crest_{t}.webp", 320 / im.width)
+if "--crests" in sys.argv:
+    for t in CREST_TURN: print(f"crest_{t}.webp", crest(t))
+    sys.exit()
 
 parts = {"K": K, "bodies": {}, "heads": {}, "hats": {}, "pets": {}, "colours": HC.COLOURS, "classes": HC.CLASSES}
 
@@ -97,9 +109,7 @@ for p in PETS:
     im = A.load_pet(p); name = f"pet_{p}.webp"; save(im, name, K)
     parts["pets"][p] = {"src": rel(name), "m": m6(scale_shift(1 / K, 920 - im.width // 2, 985 - im.height))}
 
-# Team crests, for the name screen and the card.
-for t in ("neta", "roni"):
-    im = cutout(f"crest_{t}.jpg"); im = im.crop(im.getbbox()); save(im, f"crest_{t}.webp", 320 / im.width)
+for t in CREST_TURN: crest(t)
 parts["crests"] = {"neta": rel("crest_neta.webp"), "roni": rel("crest_roni.webp")}
 
 with open(os.path.join(ROOT, "parts.js"), "w") as fh:
