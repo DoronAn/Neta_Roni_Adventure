@@ -1,8 +1,8 @@
-// The hero as a round relief for 3D printing, and a plate with the team's crest for its back. Head and shoulders,
-// headwear included, no companion, like a coin portrait, on a pattern from the hero's homeland.
+// The hero as a round relief for 3D printing. Head and shoulders, headwear included, no companion, like a coin
+// portrait, on a pattern from the hero's homeland.
 // The sculpted forms come from pictures made once, ahead of time, by tools/parts/relief_maps.py (a depth model reads
 // every look the print page can draw): parts/relief/<species>_<m|f>_<class>_<hat>.webp holds the relief, the drawing's
-// bold strokes (engraved into it) and the outline; pattern_<homeland>.webp and plate_<team>.webp the rest.
+// bold strokes (engraved into it) and the outline; pattern_<homeland>.webp the pattern.
 // Every size is a setting (millimetres). Output: binary STLs, closed (every edge shared by exactly two triangles),
 // with the back flat on the print bed.
 // A plain script (not a module). Needs PARTS, HeroArt, KIDS.
@@ -17,11 +17,9 @@ const Relief = (() => {
     groove: 0.4,         // how deep the drawing's bold strokes are engraved
     engrave: 1,          // 1: engrave the strokes; 0: smooth sculpture only
     pocketDiameter: 6.3, pocketDepth: 2.1,   // for a 6 x 2 mm disc magnet, open on the back
-    plateBase: 1.0,      // the plate: almost flat, the crest a shallow relief on it
-    plateRelief: 0.4,
     grid: 0.1,           // millimetres between height samples
   };
-  const PATTERN_MAX = 0.45, PLATE_MAX = 0.4, HALO = 0.5, RIM_GAP = 0.35;   // as relief_maps.py wrote them
+  const PATTERN_MAX = 0.45, HALO = 0.5, RIM_GAP = 0.35;   // as relief_maps.py wrote them
 
   // ---- the portrait (relief_portraits.js draws every look this way) ----
   // Framed by the bare head: the head (ears and horns, no hat) fills FRAC of the frame's height, with ABOVE of the
@@ -137,19 +135,6 @@ const Relief = (() => {
     return { S, N: top.N, z: top.z, zb: back.z, top: S.base + S.relief };
   }
 
-  // ---- the plate: the team's crest, almost flat, glued over the magnet ----
-  async function plate(h, set = {}) {
-    const S = { ...DEFAULTS, ...set };
-    const team = KIDS[h.kid].team, pic = await picture(`parts/relief/plate_${team}.webp`);
-    const n = pic.n, mm = S.diameter / n, crest = channel(pic, 0, S.plateRelief), R = S.diameter / 2;   // stored as 0..PLATE_MAX
-    const top = disc(S, (x, y, r) => {
-      const inside = sample(crest, n, (x + R) / mm - 0.5, (y + R) / mm - 0.5);
-      const t = Math.min(1, Math.max(0, (r - (R - 1.2)) / 0.2 + 0.5));   // a rim 1.2 mm wide
-      return S.plateBase + inside * (1 - t) + S.plateRelief * t;
-    });
-    return { S, N: top.N, z: top.z, zb: new Float32Array(top.N * top.N), top: S.plateBase + S.plateRelief };
-  }
-
   // ---- STL: a closed mesh between the back (zb) and the top (z), over the grid cells inside the disc ----
   // Image rows run down; the mesh's y runs up, so row j is y = (N - 1 - j).
   function stl(hm, title = "Hero relief, millimetres") {
@@ -237,5 +222,5 @@ const Relief = (() => {
     ctx.putImageData(img, 0, 0);
   }
 
-  return { DEFAULTS, frame, portrait, lookKey, front, plate, stl, printed, preview };
+  return { DEFAULTS, frame, portrait, lookKey, front, stl, printed, preview };
 })();

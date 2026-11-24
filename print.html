@@ -36,7 +36,7 @@
 <body>
   <main>
     <h1>תבליט להדפסה</h1>
-    <p class="sub">הקוד מכרטיס הגיבור ← תבליט עגול של הגיבור (ראש וכתפיים, עם הכובע, בלי חיית הלוויה) על רקע ממולדתו, ולוחית עם סמל החבורה לגב. שני קובצי STL להדפסה בתלת־ממד.</p>
+    <p class="sub">הקוד מכרטיס הגיבור ← תבליט עגול של הגיבור (ראש וכתפיים, עם הכובע, בלי חיית הלוויה) על רקע ממולדתו. קובץ STL להדפסה בתלת־ממד.</p>
     <div class="row">
       <input type="text" id="code" placeholder="XXX-XXXX" maxlength="9" autocomplete="off" spellcheck="false">
       <button id="make">הכנה</button>
@@ -48,17 +48,16 @@
       <div class="views">
         <figure><canvas id="relief"></canvas><figcaption>התבליט (הקובץ)</figcaption></figure>
         <figure><canvas id="printed"></canvas><figcaption>כפי שיודפס (פיה 0.4 מ"מ)</figcaption></figure>
-        <figure><canvas id="plate"></canvas><figcaption>הלוחית לגב</figcaption></figure>
         <figure><canvas id="portrait"></canvas><figcaption>הדמות שממנה הוא נבנה</figcaption></figure>
       </div>
-      <div class="row"><button id="download" disabled>הורדת התבליט (STL)</button><button id="download-plate" disabled>הורדת הלוחית (STL)</button></div>
+      <div class="row"><button id="download" disabled>הורדת התבליט (STL)</button></div>
       <p class="stats" id="stats"></p>
     </section>
     <details>
       <summary>מידות (במילימטרים)</summary>
       <div class="grid" id="settings"></div>
       <p class="note">הבסיס עבה משקע המגנט כדי שהשקע לא יחורר את התבליט. אחרי שינוי מידה לוחצים שוב על "הכנה".</p>
-      <p class="note">הדפסה: שכבה 0.08 מ"מ, בלי תמיכות. התבליט מודפס כשהפנים למעלה (שקע המגנט על המשטח), הלוחית כשהסמל למעלה. המגנט נכנס לשקע, והצד השטוח של הלוחית מודבק עליו, הסמל זקוף כמו הדמות.</p>
+      <p class="note">הדפסה: שכבה 0.08 מ"מ, בלי תמיכות. התבליט מודפס כשהפנים למעלה (שקע המגנט על המשטח). המגנט נכנס לשקע.</p>
     </details>
   </main>
   <script src="kids.js"></script>

@@ -21,10 +21,9 @@ for (const k of Object.keys(CATALOG.abilities)) { need.add(`ui/badge_${k}.webp`)
 for (const k of Object.keys(CATALOG.homelands)) { need.add(`ui/home_${k}.webp`); need.add(`ui/scene_${k}.jpg`); }
 for (const k of ["neta", "roni"]) need.add(`ui/stamp_${k}.webp`);
 need.add("ui/shield.webp");
-// the print page's relief pictures (tools/parts/relief_maps.py): one per look, a pattern per homeland, a plate per team
+// the print page's relief pictures (tools/parts/relief_maps.py): one per look, a pattern per homeland
 for (const s of Object.keys(CATALOG.species)) for (const g of ["m", "f"]) for (const c of cls) for (const h of ["none", ...hats]) need.add(`parts/relief/${s}_${g}_${c}_${h}.webp`);
 for (const k of Object.keys(CATALOG.homelands)) need.add(`parts/relief/pattern_${k}.webp`);
-for (const k of ["neta", "roni"]) need.add(`parts/relief/plate_${k}.webp`);
 for (const f of need) if (!fs.existsSync(path.join(root, f))) miss.push("file " + f);
 if (miss.length) { console.error(miss.slice(0, 20).join("\n")); process.exit(1); }
 console.log(`ok: ${need.size} pictures, all present`);

@@ -3,7 +3,7 @@
 For every look (relief_portraits.js draws them), a depth model estimates how near each part of the picture is; that is
 turned into a gently sculpted relief (depth jumps compressed into slopes, 0 at the outline, local detail boosted), and
 the drawing's bold strokes (outlines, eyes, brows, mouth) are found at the printer's pen width. Also writes the six
-homeland patterns and the two team plates. The page (relief.js) puts them together into the print files.
+homeland patterns. The page (relief.js) puts them together into the print files.
 
   python3 tools/parts/relief_maps.py <repo root> <portraits dir> <model.onnx> [key,key,...]
 
@@ -15,7 +15,6 @@ Outputs, all 512 x 512 lossless WebP, in parts/relief/:
   <species>_<m|f>_<class>_<hat>.webp red = relief (0..1.05 as 0..255), green = groove (255 = engraved), blue = outline
                                      (255 inside), over the medal's window (WIN mm across)
   pattern_<homeland>.webp            grey = pattern height (0..PAT_MAX mm as 0..255) over the window
-  plate_<team>.webp                  grey = plate height (0..PLATE_MAX mm as 0..255) over the whole plate (DIAM mm)
 """
 import os, sys, time
 import numpy as np
@@ -29,7 +28,6 @@ WIN = DIAM - 2 * RIM            # the window inside the rim, mm
 PEN = 0.45                      # the narrowest groove a 0.4 mm nozzle keeps, mm
 OUT_PX = 512
 PAT_MAX = 0.45
-PLATE_MAX = 0.4
 
 
 # ---------------------------------------------------------------- shared
@@ -68,16 +66,6 @@ def reconstruct(seed, mask):
     lab, nl = ndi.label(mask, structure=np.ones((3, 3)))
     keep = np.unique(lab[seed & mask]); keep = keep[keep > 0]
     return np.isin(lab, keep)
-
-
-def rgb2hsv(rgb):
-    mx = rgb.max(-1); mn = rgb.min(-1); d = mx - mn
-    r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
-    dd = np.where(d == 0, 1, d)
-    h = np.where(mx == r, ((g - b) / dd) % 6, np.where(mx == g, (b - r) / dd + 2, (r - g) / dd + 4)) * 60
-    h = np.where(d == 0, 0, h)
-    s = np.where(mx == 0, 0, d / np.where(mx == 0, 1, mx))
-    return h, s, mx
 
 
 class Depth:
@@ -305,52 +293,6 @@ def pattern_map(home, n=OUT_PX):
     return PATTERNS[home](X, Y)
 
 
-# ---------------------------------------------------------------- the team plates
-def cutout(path, thresh=232):
-    """White background removed by flood fill from the edges (as tools/parts/join.py)."""
-    a = np.asarray(Image.open(path).convert("RGB")).astype(int)
-    light = a.min(axis=2) >= thresh
-    lab, _ = ndi.label(light)
-    edge = np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))
-    bg = np.isin(lab, edge[edge > 0])
-    return np.dstack([a.astype(np.uint8), np.where(bg, 0, 255).astype(np.uint8)])
-
-
-def plate_map(team, root, depth):
-    """The crest as a shallow relief: the animal rounded from the depth model with its bold strokes engraved, the crest's
-    inner ring raised. Heights (mm) over the whole plate (DIAM) at OUT_PX."""
-    rgba = cutout(os.path.join(root, "parts", "raw", f"crest_{team}.jpg"))
-    a = rgba.astype(np.float64) / 255
-    N = a.shape[0]
-    rim_in = DIAM / 2 - 1.2
-    mmpx = rim_in / 470.0                       # the crest's gold band starts at 470 px from its centre
-    h, s, v = rgb2hsv(a[..., :3])
-    yy, xx = np.mgrid[0:N, 0:N]
-    r = np.hypot(xx - (N - 1) / 2, yy - (N - 1) / 2)
-    field = ((h > 160) & (h < 200) & (s > 0.22) & (v > 0.35)) if team == "neta" else ((h > 18) & (h < 40) & (s > 0.62) & (v > 0.72))
-    m = (r < 432) & ~field & (a[..., 3] > 0.5)
-    m = ndi.binary_opening(m, structure=disk(3))
-    m = ndi.binary_fill_holes(ndi.binary_closing(m, structure=disk(4)))
-    lab, nl = ndi.label(m)
-    if nl:
-        sizes = ndi.sum(m, lab, range(1, nl + 1))
-        m = np.isin(lab, 1 + np.nonzero(sizes > 0.002 * N * N)[0])
-    d = depth(rgba).astype(np.float64)
-    lo, hi = np.percentile(d[m], [1, 99.5])
-    k = 2
-    hn = sculpt_from_depth(np.clip((d - lo) / (hi - lo), 0, 1)[::k, ::k], m[::k, ::k], detail=1.0, top_pct=99.5)
-    hn = np.clip(down(hn, N, Image.BICUBIC), 0, 1)
-    STEP, GROOVE, H_RING = 0.15, 0.15, 0.3
-    z = np.where(m, STEP + (PLATE_MAX - STEP) * hn - GROOVE * bold_strokes(a[..., :3], m, mmpx), 0.0)
-    z = np.where(m, np.maximum(z, 0.08), 0.0)
-    ring = np.clip(1 - (np.abs(r * mmpx - 444 * mmpx) - 0.3) / 0.05, 0, 1)
-    z = ndi.gaussian_filter(np.maximum(z, H_RING * ring), 0.8)
-    # resample onto the plate: OUT_PX over DIAM mm, centred
-    c = (np.arange(OUT_PX) + 0.5) * (DIAM / OUT_PX) - DIAM / 2
-    X, Y = np.meshgrid(c, c)
-    return ndi.map_coordinates(z, [Y / mmpx + (N - 1) / 2, X / mmpx + (N - 1) / 2], order=1, mode="constant", cval=0.0)
-
-
 def grey(path, z, zmax):
     save(path, np.clip(z / zmax * 255, 0, 255).round().astype(np.uint8), "L")
 
@@ -366,11 +308,6 @@ def main():
         if not os.path.exists(p):
             grey(p, pattern_map(home), PAT_MAX)
     depth = Depth(model)
-    for team in ("neta", "roni"):
-        p = os.path.join(out, f"plate_{team}.webp")
-        if not os.path.exists(p):
-            grey(p, plate_map(team, root, depth), PLATE_MAX)
-            print("plate", team, flush=True)
     keys = sorted(f[:-4] for f in os.listdir(portraits) if f.endswith(".png"))
     if only:
         keys = [k for k in keys if k in only]
